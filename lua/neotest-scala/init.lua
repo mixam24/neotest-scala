@@ -55,67 +55,77 @@ local function build_position_id(position, parents)
     )
 end
 
+local function get_match_type(captured_nodes)
+    if captured_nodes["test.name"] then
+        return "test"
+    end
+    if captured_nodes["namespace.name"] then
+        return "namespace"
+    end
+end
+
+local function build_position(file_path, source, captured_nodes)
+    local match_type = get_match_type(captured_nodes)
+    if match_type then
+        ---@type string
+        local name = vim.treesitter.get_node_text(captured_nodes[match_type .. ".name"], source)
+        local func_name
+        if match_type == "test" then
+            func_name = vim.treesitter.get_node_text(captured_nodes[match_type .. ".func_name"], source)
+        end
+        local definition = captured_nodes[match_type .. ".definition"]
+
+        return {
+            type = match_type,
+            path = file_path,
+            name = name,
+            range = { definition:range() },
+            definition_type = definition:type(),
+            func_name = func_name,
+        }
+    end
+end
 ---@async
 ---@return neotest.Tree | nil
 function ScalaNeotestAdapter.discover_positions(path)
     local query = [[
+    ; -- Namespaces --
+    ; Matches: `object 'Name' ...`
 	  (object_definition
 	   name: (identifier) @namespace.name)
 	   @namespace.definition
-	  
-      (class_definition
-      name: (identifier) @namespace.name)
-      @namespace.definition
 
-      ((call_expression
-        function: (call_expression
-        function: (identifier) @func_name (#match? @func_name "test")
-        arguments: (arguments (string) @test.name))
-      )) @test.definition
+    ; Matches: `class 'Name' ...`
+    (class_definition
+    name: (identifier) @namespace.name)
+    @namespace.definition
 
-      ((infix_expression
-        left: (infix_expression
-          left: (identifier) @test.describe
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          operator: (identifier) @keyword.ignore (#eq? @keyword.ignore "ignore")
-        )
-      )) @test.ignore
-      ((call_expression
-        function: (identifier) @keyword.pending (#eq? @keyword.pending "pending")
-      )) @test.pending
-      ((call_expression
-        function: (identifier) @keyword.cancel (#eq? @keyword.cancel "cancel")
-      )) @test.cancel
-      ((call_expression
-        function: (identifier) @keyword.info (#eq? @keyword.info "info")
-        arguments: (arguments (string) @test.additional_info)
-      )) @test.info
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          operator: (identifier) @keyword.which (#eq? @keyword.which "which")
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition_with_which
+    ; -- Tests --
+    ; Matches: test('name') {...}
+    ((call_expression
+      function: (call_expression
+      function: (identifier) @test.func_name (#match? @test.func_name "test")
+      arguments: (arguments (string) @test.name))
+    )) @test.definition
+
+    ; Matches: `"name" should / "name" when`
+    ((infix_expression
+      left: (string) @test.name
+      operator: (identifier) @test.func_name (#any-of? @test.func_name "should" "when")
+      right: (block)
+    )) @test.definition
+
+    ; Matches: `"name" in`
+    ((infix_expression
+      left: (string) @test.name
+      operator: (identifier) @test.func_name (#eq? @test.func_name "in")
+      right: (block)
+    )) @test.definition
     ]]
     return lib.treesitter.parse_positions(
         path,
         query,
-        { nested_tests = true, require_namespaces = true, position_id = build_position_id }
+        { nested_tests = true, require_namespaces = true, build_position = build_position }
     )
 end
 

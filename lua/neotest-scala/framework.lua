@@ -1,5 +1,5 @@
 local utils = require("neotest-scala.utils")
-
+local tresitter = require("neotest.lib.treesitter")
 local M = {}
 
 TEST_PASSED = "passed" -- the test passed
@@ -304,6 +304,44 @@ local function scalatest_framework()
         return nil
     end
 
+    local function test_arguments(tree, args)
+        local node = tree:data()
+        local package_query = [[
+               ; -- Query --
+	             (package_clause
+	              name: (package_identifier) @test.name
+               ) @test.definition
+               ]]
+        if node.type == "test" then
+            local name
+            if args.name then
+                name = node.name .. " " .. args.name
+            else
+                name = node.name
+            end
+            return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { name = name }))
+        elseif node.type == "namespace" then
+            local class
+            if args.class then
+                class = node.name .. "." .. args.class
+            else
+                class = node.name
+            end
+            return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { class = class }))
+        elseif node.type == "file" then
+            local package =
+                tresitter.parse_positions(node.path, package_query, { nested_tests = true, require_namespaces = false })
+            for _, child in package:iter_nodes() do
+                local data = child:data()
+                if data.type == "test" then
+                    -- TODO: current assumption/limitation is that file contains exactly one package
+                    return vim.tbl_deep_extend("force", args, { class = data.name .. "." .. args.class })
+                end
+            end
+            return args
+        end
+    end
+
     --- Builds a command for running tests for the framework.
     ---@param runner string
     ---@param project string
@@ -312,6 +350,7 @@ local function scalatest_framework()
     ---@param extra_args table|string
     ---@return string[]
     local function build_command(runner, project, tree, name, extra_args)
+        print(vim.inspect(test_arguments(tree, {})))
         local test_namespace = build_test_namespace(tree, name)
         if runner == "bloop" then
             local full_test_path
