@@ -265,60 +265,54 @@ end
 
 ---@return neotest-scala.Framework
 local function scalatest_framework()
-    -- Builds a test path from the current position in the tree.
-    ---@param tree neotest.Tree
-    ---@return string|nil
-    local function build_test_namespace(tree, name)
-        local parent_tree = tree:parent()
-        local type = tree:data().type
-        if parent_tree and parent_tree:data().type == "namespace" then
-            local package = utils.get_package_name(parent_tree:data().path)
-            local parent_name = parent_tree:data().name
-            return package .. parent_name
-        end
-        if parent_tree and parent_tree:data().type == "test" then
-            return nil
-        end
-        if type == "namespace" then
-            local package = utils.get_package_name(tree:data().path)
-            if not package then
-                return nil
-            end
-            return package .. name
-        end
-        if type == "file" then
-            local test_suites = {}
-            for _, child in tree:iter_nodes() do
-                if child:data().type == "namespace" then
-                    table.insert(test_suites, child:data().name)
-                end
-            end
-            if test_suites then
-                local package = utils.get_package_name(tree:data().path)
-                return package .. "*"
-            end
-        end
-        if type == "dir" then
-            return "*"
-        end
-        return nil
-    end
-
-    local function test_arguments(tree, args)
-        local node = tree:data()
-        local package_query = [[
+    ---Retrieves scala package identifiers from the given file
+    ---@param file_path string: file path
+    ---@return table: list of packages found
+    local function package_names(file_path)
+        local query = [[
                ; -- Query --
 	             (package_clause
 	              name: (package_identifier) @test.name
                ) @test.definition
                ]]
-        if node.type == "test" then
-            local name
-            if args.name then
-                name = node.name .. " " .. args.name
-            else
-                name = node.name
+        local packages = {}
+        local tree = tresitter.parse_positions(file_path, query, { nested_tests = true, require_namespaces = false })
+        for _, child in tree:iter_nodes() do
+            local data = child:data()
+            if data.type == "test" then
+                table.insert(packages, 1, data.name)
             end
+        end
+        local length = #packages
+        if length == 0 then
+            error(("Con't find package name in '%s' file").format(file_path), vim.log.levels.ERROR)
+        end
+        if length > 1 then
+            -- TODO: current assumption/limitation is that file contains exactly one package
+            error(("More than one package name found in '%s' file").format(file_path), vim.log.levels.ERROR)
+        end
+        return packages
+    end
+
+    local function construct_test_name(node, passed_name)
+        if passed_name then
+            return node.name .. string.format(" %s ", node.func_name) .. passed_name
+        else
+            return node.name
+        end
+    end
+
+    ---@class TestArguments
+    ---@field name string|nil
+    ---@field class string|nil
+
+    ---@param tree neotest.Tree Neotest tree to traverse
+    ---@param args TestArguments already defined test arguments
+    ---@return TestArguments
+    local function test_arguments(tree, args)
+        local node = tree:data()
+        if node.type == "test" then
+            local name = construct_test_name(node, args.name)
             return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { name = name }))
         elseif node.type == "namespace" then
             local class
@@ -329,15 +323,9 @@ local function scalatest_framework()
             end
             return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { class = class }))
         elseif node.type == "file" then
-            local package =
-                tresitter.parse_positions(node.path, package_query, { nested_tests = true, require_namespaces = false })
-            for _, child in package:iter_nodes() do
-                local data = child:data()
-                if data.type == "test" then
-                    -- TODO: current assumption/limitation is that file contains exactly one package
-                    return vim.tbl_deep_extend("force", args, { class = data.name .. "." .. args.class })
-                end
-            end
+            local package = package_names(node.path)[1]
+            return vim.tbl_deep_extend("force", args, { class = package .. "." .. args.class })
+        else
             return args
         end
     end
@@ -350,32 +338,26 @@ local function scalatest_framework()
     ---@param extra_args table|string
     ---@return string[]
     local function build_command(runner, project, tree, name, extra_args)
-        print(vim.inspect(test_arguments(tree, {})))
-        local test_namespace = build_test_namespace(tree, name)
+        local arguments = test_arguments(tree, {})
         if runner == "bloop" then
             local full_test_path
-            if not test_namespace then
-                full_test_path = {}
-            elseif tree:data().type ~= "test" then
-                full_test_path = { "-o", test_namespace }
-            else
-                full_test_path = { "-o", test_namespace, "--", "-z", name }
+            full_test_path = { "-o", arguments.class }
+            if arguments.name then
+                full_test_path = vim.tbl_flatten({ full_test_path, { "--", "-z", arguments.name } })
             end
-            return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
+            local res = vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
+            return res
         end
-        if not test_namespace then
+        if not arguments.class then
             return vim.tbl_flatten({ "sbt", extra_args, project .. "/test" })
         end
-        -- TODO: Run sbt with colors, but figuoure wich ainsi sequence need to be matched.
-        local test_path = ""
-        if tree:data().type == "test" then
-            test_path = ' -- -z "' .. name .. '"'
-        end
+        -- TODO: Run sbt with colors, but figure out wich ainsi sequence need to be matched.
         return vim.tbl_flatten({
             "sbt",
             "--no-colors",
             extra_args,
-            project .. "/testOnly " .. test_namespace .. test_path,
+            project .. "/testOnly ",
+            { "--", "-z", string.format('"%s"', arguments.name) },
         })
     end
 

@@ -67,8 +67,13 @@ end
 local function build_position(file_path, source, captured_nodes)
     local match_type = get_match_type(captured_nodes)
     if match_type then
-        ---@type string
-        local name = vim.treesitter.get_node_text(captured_nodes[match_type .. ".name"], source)
+        local test_name = captured_nodes[match_type .. ".name"]
+        local name
+        name = vim.treesitter.get_node_text(test_name, source)
+        if test_name:type() == "string" then
+            -- TODO: in future we may want to handle more cases...
+            name = name:gsub('^"(.*)"$', "%1")
+        end
         local func_name
         if match_type == "test" then
             func_name = vim.treesitter.get_node_text(captured_nodes[match_type .. ".func_name"], source)
