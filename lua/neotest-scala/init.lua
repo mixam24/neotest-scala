@@ -42,19 +42,6 @@ local get_parent_name = function(pos)
     return utils.get_position_name(pos)
 end
 
----@param position neotest.Position The position to return an ID for
----@param parents neotest.Position[] Parent positions for the position
----@return string
-local function build_position_id(position, parents)
-    return table.concat(
-        vim.tbl_flatten({
-            vim.tbl_map(get_parent_name, parents),
-            utils.get_position_name(position),
-        }),
-        "."
-    )
-end
-
 local function get_match_type(captured_nodes)
     if captured_nodes["test.name"] then
         return "test"
@@ -250,9 +237,15 @@ end
 
 ---@async
 ---@param args neotest.RunArgs
----@return neotest.RunSpec
+---@return nil|neotest.RunSpec|neotest.RunSpec[]
 function ScalaNeotestAdapter.build_spec(args)
     local position = args.tree:data()
+    if position.type == "dir" then
+        -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
+        -- I.e. it is not safe to build spec for dir and we need to process each test file in dir.
+        -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
+        return nil
+    end
     local runner = get_runner()
     assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
     local project = get_project_name(position.path, runner)
@@ -275,19 +268,18 @@ end
 local function get_results(tree, test_results, match_func)
     local no_results = vim.tbl_isempty(test_results)
     local results = {}
+    local framework = fw.get_framework_class(get_framework())
+    local events = framework.get_test_results(test_results)
     for _, node in tree:iter_nodes() do
-        local position = node:data()
+        local node = node:data()
         if no_results then
-            results[position.id] = { status = TEST_FAILED }
+            print("No results...")
+            results[node.id] = { status = TEST_FAILED }
         else
-            local test_result
-            if match_func then
-                test_result = match_func(test_results, position.id)
-            else
-                test_result = test_results[position.id]
-            end
-            if test_result then
-                results[position.id] = { status = test_result }
+            local name = string.gsub(string.sub(node.id, string.len(node.path), -1), "::", " ")
+            print(name)
+            if events[name] then
+                print(vim.inspect(events[name]))
             end
         end
     end
@@ -304,6 +296,10 @@ function ScalaNeotestAdapter.results(_, result, tree)
     if not success or not framework then
         return {}
     end
+    -- for _, child in tree:iter_nodes() do
+    --     local data = child:data()
+    --     print(vim.inspect(data))
+    -- end
     local test_results = framework.get_test_results(lines)
     return get_results(tree, test_results, framework.match_func)
 end

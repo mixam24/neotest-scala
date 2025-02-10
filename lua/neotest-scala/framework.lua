@@ -7,7 +7,7 @@ TEST_FAILED = "failed" -- the test failed
 
 ---@class neotest-scala.Framework
 ---@field build_command fun(runner: string, project: string, tree: neotest.Tree, name: string, extra_args: table|string): string[]
----@field get_test_results fun(output_lines: string[]): table<string, string>
+---@field get_test_results fun(output_lines: string[]): table<string, neotest.Result>
 ---@field match_func nil|fun(test_results: table<string, string>, position_id :string):string|nil
 
 --- Strip ainsi characters from the string, leaving the rest of the string intact.
@@ -294,6 +294,52 @@ local function scalatest_framework()
         return packages
     end
 
+    local function suite_names(file_path)
+        local query = [[
+              ; Matches: `object 'Name' ...`
+	            (object_definition
+	             name: (identifier) @test.name)
+	             @test.definition
+
+              ; Matches: `class 'Name' ...`
+              (class_definition
+              name: (identifier) @test.name)
+              @test.definition
+               ]]
+        local suites = {}
+        local tree = tresitter.parse_positions(file_path, query, { nested_tests = true, require_namespaces = false })
+        for _, child in tree:iter_nodes() do
+            local data = child:data()
+            if data.type == "test" then
+                table.insert(suites, 1, data.name)
+            end
+        end
+        local length = #suites
+        if length == 0 then
+            error(string.format("Can't find any suite in '%s' file", file_path), vim.log.levels.ERROR)
+        end
+        return suites
+    end
+
+    ---comment
+    ---@param tree neotest.Tree Neotest tree to traverse
+    ---@return TestArguments[]
+    local function suite_arguments(tree)
+        local node = tree:data()
+        if not node.type == "file" then
+            error(
+                string.format("Expected to receive a node of type 'file' but got '%s'", node.type, vim.log.levels.ERROR)
+            )
+        end
+        local package = package_names(node.path)[1]
+        local suites = suite_names(node.path)
+        local arguments = {}
+        for _, suite in pairs(suites) do
+            table.insert(arguments, { class = package .. "." .. suite })
+        end
+        return arguments
+    end
+
     local function construct_test_name(node, passed_name)
         if passed_name then
             return node.name .. string.format(" %s ", node.func_name) .. passed_name
@@ -308,7 +354,7 @@ local function scalatest_framework()
 
     ---@param tree neotest.Tree Neotest tree to traverse
     ---@param args TestArguments already defined test arguments
-    ---@return TestArguments
+    ---@return TestArguments|nil
     local function test_arguments(tree, args)
         local node = tree:data()
         if node.type == "test" then
@@ -324,9 +370,12 @@ local function scalatest_framework()
             return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { class = class }))
         elseif node.type == "file" then
             local package = package_names(node.path)[1]
-            return vim.tbl_deep_extend("force", args, { class = package .. "." .. args.class })
+            if args.class then
+                return vim.tbl_deep_extend("force", args, { class = package .. "." .. args.class })
+            end
         else
-            return args
+            -- Need to run all suites -> pass to another function
+            return nil
         end
     end
 
@@ -339,17 +388,31 @@ local function scalatest_framework()
     ---@return string[]
     local function build_command(runner, project, tree, name, extra_args)
         local arguments = test_arguments(tree, {})
+        if arguments then
+            arguments = { arguments }
+        else
+            arguments = suite_arguments(tree)
+        end
         if runner == "bloop" then
             local full_test_path
-            full_test_path = { "-o", arguments.class }
-            if arguments.name then
-                full_test_path = vim.tbl_flatten({ full_test_path, { "--", "-z", arguments.name } })
+            if #arguments == 1 then
+                full_test_path = { "-o", arguments[1].class, "--", "-oDU" }
+                if arguments[1].name then
+                    full_test_path = vim.tbl_flatten(full_test_path, { "-z", arguments[1].name })
+                end
+                print(vim.inspect(full_test_path))
+                return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
+            else
+                full_test_path = {}
+                for _, arg in pairs(arguments) do
+                    full_test_path = vim.tbl_flatten(full_test_path, { "-o", arg.class })
+                end
+                print(vim.inspect(full_test_path))
+                return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path, "--", "-oDU" })
             end
-            local res = vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
-            return res
         end
         if not arguments.class then
-            return vim.tbl_flatten({ "sbt", extra_args, project .. "/test" })
+            return vim.tbl_flatten({ "sbt", extra_args, project .. "/test", "--", "-oDU" })
         end
         -- TODO: Run sbt with colors, but figure out wich ainsi sequence need to be matched.
         return vim.tbl_flatten({
@@ -357,7 +420,7 @@ local function scalatest_framework()
             "--no-colors",
             extra_args,
             project .. "/testOnly ",
-            { "--", "-z", string.format('"%s"', arguments.name) },
+            { "--", "-oU", "-z", string.format('"%s"', arguments.name) },
         })
     end
 
@@ -375,6 +438,23 @@ local function scalatest_framework()
         return output:match("^([%w%.]+):") or nil
     end
 
+    ---Check if line represents begining or ending of the section
+    ---@param line string: a single line of the test output
+    local function check_for_context(line)
+        local match
+        local sanitized_string = strip_ainsi_chars(line)
+        _, _, match = string.find(sanitized_string, "Suite Starting -- (.*)")
+        if match then
+            return { type = "suite", event = "start", name = match }
+        end
+        _, _, match = string.find(sanitized_string, "Suite Completed -- (.*)")
+        if match then
+            return { type = "suite", event = "end", name = match }
+        end
+        print(line)
+        return nil
+    end
+
     -- Get test results from the test output.
     ---@param output_lines string[]
     ---@return table<string, string>
@@ -382,23 +462,9 @@ local function scalatest_framework()
         local test_results = {}
         local test_namespace = nil
         for _, line in ipairs(output_lines) do
-            line = vim.trim(strip_sbt_info_prefix(strip_ainsi_chars(line)))
-            local current_namespace = get_test_namespace(line)
-            if current_namespace and (not test_namespace or test_namespace ~= current_namespace) then
-                test_namespace = current_namespace
-            end
-            if test_namespace and vim.startswith(line, "-") and vim.endswith(line, " *** FAILED ***") then
-                local test_name = get_test_name(line, " *** FAILED ***")
-                if test_name then
-                    local test_id = test_namespace .. "." .. vim.trim(test_name)
-                    test_results[test_id] = TEST_FAILED
-                end
-            elseif test_namespace and vim.startswith(line, "-") then
-                local test_name = get_test_name(line, "")
-                if test_name then
-                    local test_id = test_namespace .. "." .. vim.trim(test_name)
-                    test_results[test_id] = TEST_PASSED
-                end
+            local event = check_for_context(line)
+            if event then
+                print(vim.inspect(event))
             end
         end
         return test_results
