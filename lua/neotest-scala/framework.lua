@@ -4,13 +4,15 @@ local M = {}
 ---@param framework string
 ---@return neotest-scala.Framework|nil
 function M.get_framework_class(framework)
+    local module
     if framework == "utest" then
-        return require("neotest-scala.frameworks.utest")
+        module = require("neotest-scala.frameworks.utest")
     elseif framework == "munit" then
-        return require("neotest-scala.frameworks.munit")
+        module = require("neotest-scala.frameworks.munit")
     elseif framework == "scalatest" then
-        return require("neotest-scala.frameworks.scalatest")
+        module = require("neotest-scala.frameworks.scalatest")
     end
+    return module
 end
 
 return M

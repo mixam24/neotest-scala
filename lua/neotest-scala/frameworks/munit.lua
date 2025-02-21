@@ -1,4 +1,5 @@
 local utils = require("neotest-scala.utils")
+local types = require("neotest.types")
 
 -- Builds a test path from the current position in the tree.
 ---@param tree neotest.Tree
@@ -83,12 +84,12 @@ local function get_test_results(output_lines)
             local test_name = get_test_name(line, "+")
             if test_name then
                 local test_id = test_namespace .. "." .. vim.trim(test_name)
-                test_results[test_id] = TEST_PASSED
+                test_results[test_id] = types.ResultStatus.passed
             end
         elseif test_namespace and vim.startswith(line, "==> X") then
             local test_name = get_test_name(line, "==> X")
             if test_name then
-                test_results[vim.trim(test_name)] = TEST_FAILED
+                test_results[vim.trim(test_name)] = types.ResultStatus.failed
             end
         end
     end

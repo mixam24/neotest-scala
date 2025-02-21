@@ -12,7 +12,9 @@ local function package_names(file_path)
            ) @test.definition
            ]]
     local packages = {}
+    ---@diagnostic disable: missing-fields
     local tree = tresitter.parse_positions(file_path, query, { nested_tests = true, require_namespaces = false })
+    ---@diagnostic enable: missing-fields
     for _, child in tree:iter_nodes() do
         local data = child:data()
         if data.type == "test" then
@@ -43,7 +45,8 @@ local function suite_names(file_path)
           @test.definition
            ]]
     local suites = {}
-    local tree = tresitter.parse_positions(file_path, query, { nested_tests = true, require_namespaces = false })
+    local opts = { nested_tests = true, require_namespaces = false }
+    local tree = tresitter.parse_positions(file_path, query, opts)
     for _, child in tree:iter_nodes() do
         local data = child:data()
         if data.type == "test" then
@@ -132,14 +135,14 @@ local function build_command(runner, project, tree, name, extra_args)
         if #arguments == 1 then
             full_test_path = { "-o", arguments[1].class, "--", "-oDU" }
             if arguments[1].name then
-                full_test_path = vim.tbl_flatten(full_test_path, { "-z", arguments[1].name })
+                full_test_path = vim.tbl_flatten({ full_test_path, { "-z", arguments[1].name } })
             end
             print(vim.inspect(full_test_path))
             return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
         else
             full_test_path = {}
             for _, arg in pairs(arguments) do
-                full_test_path = vim.tbl_flatten(full_test_path, { "-o", arg.class })
+                full_test_path = vim.tbl_flatten({ full_test_path, { "-o", arg.class } })
             end
             print(vim.inspect(full_test_path))
             return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path, "--", "-oDU" })
