@@ -1,0 +1,172 @@
+name: CI
+on:
+  workflow_dispatch:
+
+  workflow_call:
+    inputs:
+      plugin:
+        description: "Plugin name"
+        type: string
+        required: true
+      repo:
+        description: "Repo Short Url"
+        type: string
+        required: true
+      release:
+        description: "Release"
+        type: boolean
+        required: false
+        default: true
+      docs:
+        description: "Docs"
+        type: boolean
+        required: false
+        default: true
+
+jobs:
+  config:
+    name: Repo Config
+    runs-on: ubuntu-latest
+    outputs:
+      has_tests: ${{ steps.tests.outputs.has_tests }}
+      has_docs: ${{ steps.docs.outputs.has_docs }}
+      has_build: ${{ steps.build.outputs.has_build }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: tests
+        run: echo "has_tests=${{ hashFiles('scripts/test') != '' }}" >> "$GITHUB_OUTPUT"
+      - id: docs
+        run: echo "has_docs=${{ hashFiles('scripts/docs') != '' }}" >> "$GITHUB_OUTPUT"
+      - id: build
+        run: echo "has_build=${{ hashFiles('scripts/build') != '' }}" >> "$GITHUB_OUTPUT"
+
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.1
+
+  stylua:
+    name: Stylua
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check lua
+
+  debug:
+    name: Check that no debug messages are left
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Debug
+        run: |
+          if /bin/grep --line-number -r -P '^(?!\s*--).*\bdd\(' --color=always lua; then
+            echo "Debug messages found"
+            exit 1
+          else
+            echo "No debug messages found"
+          fi
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: config
+    timeout-minutes: 10
+    if: ${{ needs.config.outputs.has_tests == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: folke/github/neovim@main
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y libreadline-dev
+      - name: Test Cache
+        uses: actions/cache@v4
+        with:
+          path: .tests
+          key: ${{ runner.os }}-tests-${{ hashFiles('tests/minit.lua', 'scripts/test') }}
+      - name: Run Tests
+        run: ./scripts/test
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [tests, config]
+    if: ${{ !failure() && needs.config.outputs.has_build == 'true' && inputs.repo == github.repository && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: git pull
+      - uses: folke/github/neovim@main
+      - name: Run Build
+        run: ./scripts/build
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(build): auto-generated build files"
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [config, tests, build]
+    if: ${{ !failure() && inputs.docs && inputs.repo == github.repository && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: git pull
+      - uses: folke/github/neovim@main
+      - name: Generate docs
+        if: ${{ needs.config.outputs.has_docs == 'true' }}
+        shell: bash
+        run: ./scripts/docs
+      - name: Create /doc
+        run: mkdir -p doc
+      - name: panvimdoc
+        uses: kdheepak/panvimdoc@main
+        with:
+          vimdoc: ${{ inputs.plugin }}
+          version: "Neovim"
+          demojify: true
+          treesitter: true
+      - run: git pull
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(build): auto-generate docs"
+
+  release:
+    name: release
+    needs: tests
+    if: ${{ !failure() && inputs.release && inputs.repo == github.repository && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: release-please config
+        id: release-please-config
+        run: |
+          if [ -f .github/release-please-config.json ]; then
+            echo "config-file=.github/release-please-config.json" >> $GITHUB_OUTPUT
+            [ -f .github/release-please-manifest.json ] &&
+              echo "manifest-file=.github/release-please-manifest.json" >> $GITHUB_OUTPUT
+            [ -f .github/.release-please-manifest.json ] &&
+              echo "manifest-file=.github/.release-please-manifest.json" >> $GITHUB_OUTPUT
+          else
+            echo "release-type=simple" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: ${{ steps.release-please-config.outputs.config-file }}
+          release-type: ${{ steps.release-please-config.outputs.release-type }}
+          manifest-file: ${{ steps.release-please-config.outputs.manifest-file }}
+      - name: tag stable versions
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
+          git tag -d stable || true
+          git push origin :stable || true
+          git tag -a stable -m "Last Stable Release"
+          git push origin stable

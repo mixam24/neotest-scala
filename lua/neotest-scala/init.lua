@@ -2,6 +2,7 @@ local Path = require("plenary.path")
 local lib = require("neotest.lib")
 local fw = require("neotest-scala.framework")
 local utils = require("neotest-scala.utils")
+local types = require("neotest.types")
 
 ---@type neotest.Adapter
 local ScalaNeotestAdapter = { name = "neotest-scala" }
@@ -274,7 +275,7 @@ local function get_results(tree, test_results, match_func)
         local node = node:data()
         if no_results then
             print("No results...")
-            results[node.id] = { status = TEST_FAILED }
+            results[node.id] = { status = types.ResultStatus.failed }
         else
             local name = string.gsub(string.sub(node.id, string.len(node.path), -1), "::", " ")
             print(name)
@@ -296,10 +297,12 @@ function ScalaNeotestAdapter.results(_, result, tree)
     if not success or not framework then
         return {}
     end
-    -- for _, child in tree:iter_nodes() do
-    --     local data = child:data()
-    --     print(vim.inspect(data))
-    -- end
+    for _, child in tree:iter_nodes() do
+        local data = child:data()
+        if data.type ~= "test" then
+            print(vim.inspect(data))
+        end
+    end
     local test_results = framework.get_test_results(lines)
     return get_results(tree, test_results, framework.match_func)
 end

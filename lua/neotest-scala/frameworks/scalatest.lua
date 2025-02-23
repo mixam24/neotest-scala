@@ -133,7 +133,7 @@ local function build_command(runner, project, tree, name, extra_args)
     if runner == "bloop" then
         local full_test_path
         if #arguments == 1 then
-            full_test_path = { "-o", arguments[1].class, "--", "-oDU" }
+            full_test_path = { "-o", arguments[1].class, "--", "-oU" }
             if arguments[1].name then
                 full_test_path = vim.tbl_flatten({ full_test_path, { "-z", arguments[1].name } })
             end
@@ -145,11 +145,11 @@ local function build_command(runner, project, tree, name, extra_args)
                 full_test_path = vim.tbl_flatten({ full_test_path, { "-o", arg.class } })
             end
             print(vim.inspect(full_test_path))
-            return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path, "--", "-oDU" })
+            return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path, "--", "-oU" })
         end
     end
     if not arguments.class then
-        return vim.tbl_flatten({ "sbt", extra_args, project .. "/test", "--", "-oDU" })
+        return vim.tbl_flatten({ "sbt", extra_args, project .. "/test", "--", "-oU" })
     end
     -- TODO: Run sbt with colors, but figure out wich ainsi sequence need to be matched.
     return vim.tbl_flatten({
@@ -168,13 +168,24 @@ local function check_for_context(line)
     local sanitized_string = utils.strip_ansi_chars(line)
     _, _, match = string.find(sanitized_string, "Suite Starting -- (.*)")
     if match then
-        return { type = "suite", event = "start", name = match }
+        return { type = "namespace", event = "start", name = match }
     end
     _, _, match = string.find(sanitized_string, "Suite Completed -- (.*)")
     if match then
-        return { type = "suite", event = "end", name = match }
+        return { type = "namespace", event = "end", name = match }
     end
-    print(line)
+    _, _, match = string.find(sanitized_string, "Test Started -- (.*)")
+    if match then
+        return { type = "test", event = "start", name = match }
+    end
+    _, _, match = string.find(sanitized_string, "Test Succeeded -- (.*)")
+    if match then
+        return { type = "test", event = "end", name = match }
+    end
+    _, _, match = string.find(sanitized_string, "TEST FAILED -- (.*)")
+    if match then
+        return { type = "test", event = "fail", name = match }
+    end
     return nil
 end
 
@@ -183,7 +194,6 @@ end
 ---@return table<string, string>
 local function get_test_results(output_lines)
     local test_results = {}
-    local test_namespace = nil
     for _, line in ipairs(output_lines) do
         local event = check_for_context(line)
         if event then
