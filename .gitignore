@@ -42,3 +42,8 @@ luac.out
 .tests/
 .luarc.json
 .nvim.lua
+
+**/.metals/
+**/.bloop/
+**/.bsp/
+**/target/
