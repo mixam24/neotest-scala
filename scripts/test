@@ -1,0 +1,5 @@
+#!/bin/env bash
+unset LS_COLORS
+unset LSCOLORS
+export TERM=xterm-mono
+nvim -l tests/busted.lua --minitest

@@ -2,6 +2,7 @@ local Path = require("plenary.path")
 local lib = require("neotest.lib")
 local fw = require("neotest-scala.framework")
 local utils = require("neotest-scala.utils")
+local types = require("neotest.types")
 
 ---@type neotest.Adapter
 local ScalaNeotestAdapter = { name = "neotest-scala" }
@@ -42,80 +43,82 @@ local get_parent_name = function(pos)
     return utils.get_position_name(pos)
 end
 
----@param position neotest.Position The position to return an ID for
----@param parents neotest.Position[] Parent positions for the position
----@return string
-local function build_position_id(position, parents)
-    return table.concat(
-        vim.tbl_flatten({
-            vim.tbl_map(get_parent_name, parents),
-            utils.get_position_name(position),
-        }),
-        "."
-    )
+local function get_match_type(captured_nodes)
+    if captured_nodes["test.name"] then
+        return "test"
+    end
+    if captured_nodes["namespace.name"] then
+        return "namespace"
+    end
 end
 
+local function build_position(file_path, source, captured_nodes)
+    local match_type = get_match_type(captured_nodes)
+    if match_type then
+        local test_name = captured_nodes[match_type .. ".name"]
+        local name
+        name = vim.treesitter.get_node_text(test_name, source)
+        if test_name:type() == "string" then
+            -- TODO: in future we may want to handle more cases...
+            name = name:gsub('^"(.*)"$', "%1")
+        end
+        local func_name
+        if match_type == "test" then
+            func_name = vim.treesitter.get_node_text(captured_nodes[match_type .. ".func_name"], source)
+        end
+        local definition = captured_nodes[match_type .. ".definition"]
+
+        return {
+            type = match_type,
+            path = file_path,
+            name = name,
+            range = { definition:range() },
+            definition_type = definition:type(),
+            func_name = func_name,
+        }
+    end
+end
 ---@async
 ---@return neotest.Tree | nil
 function ScalaNeotestAdapter.discover_positions(path)
     local query = [[
+    ; -- Namespaces --
+    ; Matches: `object 'Name' ...`
 	  (object_definition
 	   name: (identifier) @namespace.name)
 	   @namespace.definition
-	  
-      (class_definition
-      name: (identifier) @namespace.name)
-      @namespace.definition
 
-      ((call_expression
-        function: (call_expression
-        function: (identifier) @func_name (#match? @func_name "test")
-        arguments: (arguments (string) @test.name))
-      )) @test.definition
+    ; Matches: `class 'Name' ...`
+    (class_definition
+    name: (identifier) @namespace.name)
+    @namespace.definition
 
-      ((infix_expression
-        left: (infix_expression
-          left: (identifier) @test.describe
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          operator: (identifier) @keyword.ignore (#eq? @keyword.ignore "ignore")
-        )
-      )) @test.ignore
-      ((call_expression
-        function: (identifier) @keyword.pending (#eq? @keyword.pending "pending")
-      )) @test.pending
-      ((call_expression
-        function: (identifier) @keyword.cancel (#eq? @keyword.cancel "cancel")
-      )) @test.cancel
-      ((call_expression
-        function: (identifier) @keyword.info (#eq? @keyword.info "info")
-        arguments: (arguments (string) @test.additional_info)
-      )) @test.info
-      ((infix_expression
-        left: (infix_expression
-          left: (string) @test.describe
-          operator: (identifier) @keyword.which (#eq? @keyword.which "which")
-          right: (string) @test.name)
-        operator: (identifier) @keyword.in (#eq? @keyword.in "in")
-        right: (block) @test.body
-      )) @test.definition_with_which
+    ; -- Tests --
+    ; Matches: test('name') {...}
+    ((call_expression
+      function: (call_expression
+      function: (identifier) @test.func_name (#match? @test.func_name "test")
+      arguments: (arguments (string) @test.name))
+    )) @test.definition
+
+    ; Matches: `"name" should / "name" when`
+    ((infix_expression
+      left: (string) @test.name
+      operator: (identifier) @test.func_name (#any-of? @test.func_name "should" "when")
+      right: (block)
+    )) @test.definition
+
+    ; Matches: `"name" in`
+    ((infix_expression
+      left: (string) @test.name
+      operator: (identifier) @test.func_name (#eq? @test.func_name "in")
+      right: (block)
+    )) @test.definition
     ]]
     return lib.treesitter.parse_positions(
         path,
         query,
-        { nested_tests = true, require_namespaces = true, position_id = build_position_id }
+        { nested_tests = true, require_namespaces = true, build_position = build_position }
     )
 end
 
@@ -235,9 +238,15 @@ end
 
 ---@async
 ---@param args neotest.RunArgs
----@return neotest.RunSpec
+---@return nil|neotest.RunSpec|neotest.RunSpec[]
 function ScalaNeotestAdapter.build_spec(args)
     local position = args.tree:data()
+    if position.type == "dir" then
+        -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
+        -- I.e. it is not safe to build spec for dir and we need to process each test file in dir.
+        -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
+        return nil
+    end
     local runner = get_runner()
     assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
     local project = get_project_name(position.path, runner)
@@ -260,19 +269,18 @@ end
 local function get_results(tree, test_results, match_func)
     local no_results = vim.tbl_isempty(test_results)
     local results = {}
+    local framework = fw.get_framework_class(get_framework())
+    local events = framework.get_test_results(test_results)
     for _, node in tree:iter_nodes() do
-        local position = node:data()
+        local node = node:data()
         if no_results then
-            results[position.id] = { status = TEST_FAILED }
+            print("No results...")
+            results[node.id] = { status = types.ResultStatus.failed }
         else
-            local test_result
-            if match_func then
-                test_result = match_func(test_results, position.id)
-            else
-                test_result = test_results[position.id]
-            end
-            if test_result then
-                results[position.id] = { status = test_result }
+            local name = string.gsub(string.sub(node.id, string.len(node.path), -1), "::", " ")
+            print(name)
+            if events[name] then
+                print(vim.inspect(events[name]))
             end
         end
     end
@@ -288,6 +296,12 @@ function ScalaNeotestAdapter.results(_, result, tree)
     local framework = fw.get_framework_class(get_framework())
     if not success or not framework then
         return {}
+    end
+    for _, child in tree:iter_nodes() do
+        local data = child:data()
+        if data.type ~= "test" then
+            print(vim.inspect(data))
+        end
     end
     local test_results = framework.get_test_results(lines)
     return get_results(tree, test_results, framework.match_func)
