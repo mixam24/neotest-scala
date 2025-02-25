@@ -1,6 +1,7 @@
 #!/usr/bin/env -S nvim -l
 
 vim.env.LAZY_STDPATH = ".tests"
+vim.env.TEST_DATA_DIR = vim.fn.getcwd() .. "/tests/test-data"
 load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
 
 -- Setup lazy.nvim
@@ -11,6 +12,10 @@ local opts = minit.busted.setup({
         "williamboman/mason-lspconfig.nvim",
         "williamboman/mason.nvim",
         "nvim-treesitter/nvim-treesitter",
+        "nvim-neotest/nvim-nio",
+        "nvim-lua/plenary.nvim",
+        "nvim-neotest/neotest",
+        "MisanthropicBit/neotest-busted",
     },
     headless = {
         -- show the output from process commands like git
