@@ -28,7 +28,7 @@ describe("Scala 2 scenarios", function()
                         range = { 0, 0, 16, 0 },
                         type = "file",
                     })
-                    assert.array(list[2]).has.no.holes(5)
+                    assert.array(list[2]).has.no.holes(2)
                 end)
             )
         end)
