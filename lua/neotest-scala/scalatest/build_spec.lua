@@ -1,3 +1,8 @@
+local lib = require("neotest.lib")
+local common = require("neotest-scala.common.build_spec")
+local tresitter = require("neotest.lib.treesitter")
+local utils = require("neotest-scala.utils")
+
 ---Retrieves scala package identifiers from the given file
 ---@param file_path string: file path
 ---@return table: list of packages found
@@ -113,8 +118,6 @@ local function test_arguments(tree, args)
     end
 end
 
-local M = {}
-
 --- Builds a command for running tests for the framework.
 ---@param runner string
 ---@param project string
@@ -122,7 +125,7 @@ local M = {}
 ---@param name string
 ---@param extra_args table|string
 ---@return string[]
-function M.build_command(runner, project, tree, name, extra_args)
+local function build_command(runner, project, tree, name, extra_args)
     local arguments = test_arguments(tree, {})
     if arguments then
         arguments = { arguments }
@@ -160,8 +163,22 @@ function M.build_command(runner, project, tree, name, extra_args)
     })
 end
 
-------@param args neotest.RunArgs
-------@return nil | neotest.RunSpec | neotest.RunSpec[]
----return function(args) end
-
-return M
+---@param runner string Name of the runner
+---@param args neotest.RunArgs
+---@return nil | neotest.RunSpec | neotest.RunSpec[]
+return function(runner, args)
+    local position = args.tree:data()
+    if position.type == "dir" then
+        -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
+        -- I.e. it is not safe to build spec for dir and we need to process each test file in dir.
+        -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
+        return nil
+    end
+    assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
+    local project = common.get_project_name(position.path, runner)
+    assert(project, "scala project not found in the build file")
+    local extra_args = args.extra_args or {}
+    local command = build_command(runner, project, args.tree, utils.get_position_name(position), extra_args)
+    local strategy = common.get_strategy_config(args.strategy, args.tree, project)
+    return { command = command, strategy = strategy }
+end

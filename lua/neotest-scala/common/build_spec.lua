@@ -1,21 +1,9 @@
 local lib = require("neotest.lib")
-local fw = require("neotest-scala.framework")
 local utils = require("neotest-scala.utils")
 
 local M = {}
 
 M.root = lib.files.match_root_pattern("build.sbt")
-
-local function get_runner()
-    local vim_test_runner = vim.g["test#scala#runner"]
-    if vim_test_runner == "blooptest" then
-        return "bloop"
-    end
-    if vim_test_runner and lib.func_util.index({ "bloop", "sbt" }, vim_test_runner) then
-        return vim_test_runner
-    end
-    return "bloop"
-end
 
 ---@param pos neotest.Position
 ---@return string
@@ -27,10 +15,6 @@ local get_parent_name = function(pos)
         return utils.get_package_name(pos.path) .. pos.name
     end
     return utils.get_position_name(pos)
-end
-
-local function get_args()
-    return {}
 end
 
 ---Get first project name from bloop projects.
@@ -45,7 +29,7 @@ end
 
 ---Get project name from build file.
 ---@return string|nil
-local function get_project_name(path, runner)
+function M.get_project_name(path, runner)
     local root = M.root(path)
     local build_file = root .. "/build.sbt"
     local success, lines = pcall(lib.files.read_lines, build_file)
@@ -72,7 +56,7 @@ end
 ---@param tree neotest.Tree
 ---@param project string
 ---@return table|nil
-local function get_strategy_config(strategy, tree, project)
+function M.get_strategy_config(strategy, tree, project)
     local position = tree:data()
     if strategy ~= "dap" or position.type == "dir" then
         return nil
@@ -125,31 +109,6 @@ local function get_strategy_config(strategy, tree, project)
         }
     end
     return nil
-end
-
----@async
----@param args neotest.RunArgs
----@return nil|neotest.RunSpec|neotest.RunSpec[]
-function M.build_spec(args)
-    local position = args.tree:data()
-    if position.type == "dir" then
-        -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
-        -- I.e. it is not safe to build spec for dir and we need to process each test file in dir.
-        -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
-        return nil
-    end
-    local runner = get_runner()
-    assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
-    local project = get_project_name(position.path, runner)
-    assert(project, "scala project not found in the build file")
-    local framework = fw.get_framework_class(get_framework())
-    if not framework then
-        return {}
-    end
-    local extra_args = vim.list_extend(get_args(), args.extra_args or {})
-    local command = framework.build_command(runner, project, args.tree, utils.get_position_name(position), extra_args)
-    local strategy = get_strategy_config(args.strategy, args.tree, project)
-    return { command = command, strategy = strategy }
 end
 
 return M
