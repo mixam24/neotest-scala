@@ -1,7 +1,9 @@
+local nio = require("nio")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
 local tresitter = require("neotest.lib.treesitter")
 local utils = require("neotest-scala.utils")
+local types = require("neotest.types")
 
 ---Retrieves scala package identifiers from the given file
 ---@param file_path string: file path
@@ -180,5 +182,38 @@ return function(runner, args)
     local extra_args = args.extra_args or {}
     local command = build_command(runner, project, args.tree, utils.get_position_name(position), extra_args)
     local strategy = common.get_strategy_config(args.strategy, args.tree, project)
-    return { command = command, strategy = strategy }
+    local results_path = nio.fn.tempname()
+    lib.files.write(results_path, "")
+    local stream_data, stop_stream = lib.files.stream_lines(results_path)
+    return {
+        command = command,
+        strategy = strategy,
+        context = {
+            results_path = results_path,
+            stop_stream = stop_stream,
+        },
+        stream = function()
+            return function()
+                local lines = stream_data()
+                local results = {}
+                for _, line in ipairs(lines) do
+                    local event = vim.json.decode(line, { luanil = { object = true } })
+                    local result
+                    if event.eventType == "TestSucceeded" then
+                        result = types.ResultStatus.passed
+                    elseif event.eventType == "TestFailed" then
+                        result = types.ResultStatus.failed
+                    elseif event.eventType == "TestSkipped" then
+                        result = types.ResultStatus.skipped
+                    else
+                        goto continue
+                    end
+                    local id = event.suiteClassName .. "::" .. event.testName
+                    results[id] = result
+                    ::continue::
+                end
+                return results
+            end
+        end,
+    }
 end
