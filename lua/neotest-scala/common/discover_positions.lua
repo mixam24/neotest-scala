@@ -17,27 +17,19 @@ end
 ---@param position neotest.Position
 ---@param parents neotest.Position[]
 ---@return string
-local function absolute_class_name(package_mapping, position, parents)
-    ---comment
-    ---@param ancestors neotest.Position[]
-    ---@param name string
-    ---@return string
-    local function construct_name(i, ancestors, name)
-        if ancestors[i] == nil then
-            return name
-        end
-        ---@type neotest.Position
-        local head = ancestors[i]
-        if head.type == "namespace" then
-            return construct_name(i + 1, ancestors, string.format("%s::%s", head.name, name))
-        else
-            return construct_name(i + 1, ancestors, string.format("%s %s", head.name, name))
-        end
+local function absolute_test_name(package_mapping, position, parents)
+    local n = #parents
+    if n == 0 then
+        local package = package_mapping[position.path][1]
+        return string.format("%s.%s", package, position.name)
     end
-    local package = package_mapping[position.path][1]
-    local name = construct_name(1, parents, position.name)
-
-    return string.format("%s.%s", package, name)
+    ---@type neotest.Position
+    local head = parents[n]
+    if head.type == "namespace" then
+        return string.format("%s::%s", head.id, position.name)
+    else
+        return string.format("%s %s", head.id, position.name)
+    end
 end
 
 local function build_position(file_path, source, captured_nodes)
@@ -107,7 +99,7 @@ return function(path)
 
     local packages = pkgs.discover_packages(path)
     local position_id = function(position, parents)
-        return absolute_class_name(packages, position, parents)
+        return absolute_test_name(packages, position, parents)
     end
     return treesitter.parse_positions(path, query, {
         nested_tests = true,
