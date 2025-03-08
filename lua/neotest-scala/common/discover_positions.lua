@@ -1,7 +1,5 @@
 local treesitter = require("neotest.lib.treesitter")
 local pkgs = require("neotest-scala.common.package")
-local utils = require("neotest.lib.func_util")
-local table_utils = require("neotest.utils")
 
 local function get_match_type(captured_nodes)
     if captured_nodes["test.name"] then

@@ -15,6 +15,9 @@ class WordSpec extends AnyWordSpec {
           Set.empty.head
         }
       }
+      "and this one will always fail" in {
+        assert(1 == 0)
+      }
     }
   }
 }

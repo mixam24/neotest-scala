@@ -81,42 +81,26 @@ local function suite_arguments(tree)
     return arguments
 end
 
-local function construct_test_name(node, passed_name)
-    if passed_name then
-        return node.name .. string.format(" %s ", node.func_name) .. passed_name
-    else
-        return node.name
-    end
-end
-
 ---@class TestArguments
 ---@field name string|nil
 ---@field class string|nil
+---@field pkg string|nil
 
 ---@param tree neotest.Tree Neotest tree to traverse
----@param args TestArguments already defined test arguments
----@return TestArguments|nil
-local function test_arguments(tree, args)
+---@return TestArguments
+local function test_arguments(tree)
     local node = tree:data()
+    print(vim.inspect(node))
     if node.type == "test" then
-        local name = construct_test_name(node, args.name)
-        return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { name = name }))
+        local split_position = string.find(node.id, "::")
+        return { class = string.sub(node.id, 1, split_position), name = string.sub(node.id, split_position + 2) }
     elseif node.type == "namespace" then
-        local class
-        if args.class then
-            class = node.name .. "." .. args.class
-        else
-            class = node.name
-        end
-        return test_arguments(tree:parent(), vim.tbl_deep_extend("force", args, { class = class }))
+        return { class = node.id }
     elseif node.type == "file" then
-        local package = package_names(node.path)[1]
-        if args.class then
-            return vim.tbl_deep_extend("force", args, { class = package .. "." .. args.class })
-        end
+        return { pkg = node.id }
     else
-        -- Need to run all suites -> pass to another function
-        return nil
+        -- It should never happen...
+        error("Should never happen...", vim.log.levels.ERROR)
     end
 end
 
@@ -124,44 +108,31 @@ end
 ---@param runner string
 ---@param project string
 ---@param tree neotest.Tree
----@param name string
----@param extra_args table|string
+---@param path string Path to the temp file for results output
 ---@return string[]
-local function build_command(runner, project, tree, name, extra_args)
-    local arguments = test_arguments(tree, {})
-    if arguments then
-        arguments = { arguments }
-    else
-        arguments = suite_arguments(tree)
-    end
+local function build_command(runner, project, tree, path)
+    local arguments = test_arguments(tree)
     if runner == "bloop" then
-        local full_test_path
-        if #arguments == 1 then
-            full_test_path = { "-o", arguments[1].class, "--", "-oU" }
-            if arguments[1].name then
-                full_test_path = vim.tbl_flatten({ full_test_path, { "-z", arguments[1].name } })
-            end
-            print(vim.inspect(full_test_path))
-            return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path })
+        local cli_args
+        if arguments.pkg then
+            cli_args = { "-m", arguments.pkg, "--", "-fJ", path }
+        elseif arguments.name then
+            cli_args = { "-o", arguments.class, "--", "-fJ", path, "-z", arguments.name }
         else
-            full_test_path = {}
-            for _, arg in pairs(arguments) do
-                full_test_path = vim.tbl_flatten({ full_test_path, { "-o", arg.class } })
-            end
-            print(vim.inspect(full_test_path))
-            return vim.tbl_flatten({ "bloop", "test", extra_args, project, full_test_path, "--", "-oU" })
+            cli_args = { "-o", arguments.class, "--", "-fJ", path }
         end
+        print(vim.inspect(cli_args))
+        return vim.tbl_flatten({ "bloop", "test", project, cli_args })
     end
     if not arguments.class then
-        return vim.tbl_flatten({ "sbt", extra_args, project .. "/test", "--", "-oU" })
+        return vim.tbl_flatten({ "sbt", project .. "/test", "--", "-fJ", path })
     end
     -- TODO: Run sbt with colors, but figure out wich ainsi sequence need to be matched.
     return vim.tbl_flatten({
         "sbt",
         "--no-colors",
-        extra_args,
         project .. "/testOnly ",
-        { "--", "-oU", "-z", string.format('"%s"', arguments.name) },
+        { "--", "-fJ", path, "-z", string.format('"%s"', arguments.name) },
     })
 end
 
@@ -179,41 +150,14 @@ return function(runner, args)
     assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
     local project = common.get_project_name(position.path, runner)
     assert(project, "scala project not found in the build file")
-    local extra_args = args.extra_args or {}
-    local command = build_command(runner, project, args.tree, utils.get_position_name(position), extra_args)
-    local strategy = common.get_strategy_config(args.strategy, args.tree, project)
     local results_path = nio.fn.tempname()
-    lib.files.write(results_path, "")
-    local stream_data, stop_stream = lib.files.stream_lines(results_path)
+    local command = build_command(runner, project, args.tree, results_path)
+    local strategy = common.get_strategy_config(args.strategy, args.tree, project)
     return {
         command = command,
         strategy = strategy,
         context = {
             results_path = results_path,
-            stop_stream = stop_stream,
         },
-        stream = function()
-            return function()
-                local lines = stream_data()
-                local results = {}
-                for _, line in ipairs(lines) do
-                    local event = vim.json.decode(line, { luanil = { object = true } })
-                    local result
-                    if event.eventType == "TestSucceeded" then
-                        result = types.ResultStatus.passed
-                    elseif event.eventType == "TestFailed" then
-                        result = types.ResultStatus.failed
-                    elseif event.eventType == "TestSkipped" then
-                        result = types.ResultStatus.skipped
-                    else
-                        goto continue
-                    end
-                    local id = event.suiteClassName .. "::" .. event.testName
-                    results[id] = result
-                    ::continue::
-                end
-                return results
-            end
-        end,
     }
 end

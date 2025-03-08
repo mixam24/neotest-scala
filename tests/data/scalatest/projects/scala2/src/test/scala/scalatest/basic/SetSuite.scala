@@ -13,4 +13,7 @@ class SetSuite extends AnyFunSuite {
       Set.empty.head
     }
   }
+  test("This one will always fail") {
+    assert(1 == 0)
+  }
 }

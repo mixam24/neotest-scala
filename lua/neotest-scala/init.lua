@@ -1,7 +1,6 @@
 local Path = require("plenary.path")
 local lib = require("neotest.lib")
 local utils = require("neotest.lib.func_util")
-local positions = require("neotest-scala.common.discover_positions")
 
 local Adapter = { name = "neotest-scala" }
 
@@ -40,16 +39,16 @@ end
 ---@async
 ---@param file_path string Absolute file path
 ---@return neotest.Tree | nil
+---@diagnostic disable-next-line: unused-local
 function Adapter.discover_positions(file_path)
-    return positions(file_path)
+    error("Not initialized!", vim.log.levels.ERROR)
 end
 
 ---@param args neotest.RunArgs
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
----@diagnostic disable: unused-local
+---@diagnostic disable-next-line: unused-local
 function Adapter.build_spec(args)
-    ---@diagnostic enable: unused-local
-    error("Not implemented!", vim.log.levels.ERROR)
+    error("Not initialized!", vim.log.levels.ERROR)
 end
 
 ---@async
@@ -57,10 +56,9 @@ end
 ---@param result neotest.StrategyResult
 ---@param tree neotest.Tree
 ---@return table<string, neotest.Result>
----@diagnostic disable: unused-local
+---@diagnostic disable-next-line: unused-local
 function Adapter.results(spec, result, tree)
-    ---@diagnostic enable: unused-local
-    error("Not implemented!", vim.log.levels.ERROR)
+    error("Not initialized!", vim.log.levels.ERROR)
 end
 
 setmetatable(Adapter, {
@@ -78,6 +76,8 @@ setmetatable(Adapter, {
         local impl = {}
         if opts.framework == "scalatest" then
             impl = require("neotest-scala.scalatest")
+        else
+            error("Not implemented yet!", vim.log.levels.ERROR)
         end
         return vim.tbl_deep_extend("force", Adapter, impl({ runner = opts.runner }))
     end,

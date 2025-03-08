@@ -1,11 +1,8 @@
-local scala = require("neotest-scala")
-local async = require("neotest-busted.async")
-local client = require("neotest.client")({
-    require("neotest-scala")({
-        framework = "scalatest",
-        runner = "bloop",
-    }),
+local scala = require("neotest-scala")({
+    framework = "scalatest",
+    runner = "bloop",
 })
+local async = require("neotest-busted.async")
 describe("Basic scenarios", function()
     describe("Scala 2.x", function()
         it(
@@ -25,7 +22,7 @@ describe("Basic scenarios", function()
                     id = file_path,
                     name = "SetSuite.scala",
                     path = file_path,
-                    range = { 0, 0, 16, 0 },
+                    range = { 0, 0, 19, 0 },
                     type = "file",
                 })
                 assert.array(list[2]).has.no.holes(2)
@@ -52,7 +49,7 @@ describe("Basic scenarios", function()
                     id = file_path,
                     name = "WordSpec.scala",
                     path = file_path,
-                    range = { 0, 0, 20, 0 },
+                    range = { 0, 0, 23, 0 },
                     type = "file",
                 })
                 assert.array(list[2]).has.no.holes(2)

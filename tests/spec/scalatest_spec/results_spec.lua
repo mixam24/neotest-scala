@@ -34,7 +34,12 @@ describe("Basic scenarios", function()
             )
 
             -- THEN
-            assert.array(results).has.no.holes(2)
+            local tests = {}
+            for key, _ in pairs(results) do
+                table.insert(tests, key)
+            end
+            assert.array(tests).has.no.holes(6)
+            assert.same(results["scala.scalatest.basic.SetSuite::This one will always fail"].status, "failed")
         end)
     )
 end)

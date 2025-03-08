@@ -1,3 +1,4 @@
+local discover_positions = require("neotest-scala.scalatest.discover_positions")
 local results = require("neotest-scala.scalatest.results")
 local build_spec = require("neotest-scala.scalatest.build_spec")
 local utils = require("neotest.lib.func_util")
@@ -18,7 +19,10 @@ setmetatable(M, {
             "'runner' value provided is not supported with 'scalatest' framework. Supported values: 'sbt', 'bloop'"
         )
         M.results = results
-        M.build_spec = utils.partial(build_spec, opts.runner)
+        M.build_spec = function(args)
+            return build_spec(opts.runner, args)
+        end
+        M.discover_positions = discover_positions
         return M
     end,
 })

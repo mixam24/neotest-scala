@@ -12,7 +12,7 @@ scalaVersion := "2.13.12"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "hello-world"
+name := "scala2"
 organization := "ch.epfl.scala"
 version := "1.0"
 
@@ -29,6 +29,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest-wordspec" % "3.2.19" % "test",
   "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.19" % "test",
 )
+
+logBuffered in Test := false
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the scala-parser-combinators dependency to the set of dependencies
