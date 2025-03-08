@@ -1,5 +1,6 @@
 local treesitter = require("neotest.lib.treesitter")
 local pkgs = require("neotest-scala.common.package")
+local utils = require("neotest.lib.func_util")
 
 local function get_match_type(captured_nodes)
     if captured_nodes["test.name"] then
@@ -10,6 +11,9 @@ local function get_match_type(captured_nodes)
     end
 end
 
+local function leaf_node(func_name)
+    return utils.index({ "test", "in" }, func_name)
+end
 ---comment
 ---@param package_mapping table<string,string[]> Mapping from file path to scala package names defined in it
 ---@param position neotest.Position
@@ -24,9 +28,21 @@ local function absolute_test_name(package_mapping, position, parents)
     ---@type neotest.Position
     local head = parents[n]
     if head.type == "namespace" then
-        return string.format("%s::%s", head.id, position.name)
+        ---@diagnostic disable-next-line: undefined-field
+        if leaf_node(position.func_name) then
+            return string.format("%s::%s", head.id, position.name)
+        else
+            ---@diagnostic disable-next-line: undefined-field
+            return string.format("%s::%s %s", head.id, position.name, position.func_name)
+        end
     else
-        return string.format("%s %s", head.id, position.name)
+        ---@diagnostic disable-next-line: undefined-field
+        if leaf_node(position.func_name) then
+            return string.format("%s %s", head.id, position.name)
+        else
+            ---@diagnostic disable-next-line: undefined-field
+            return string.format("%s %s %s", head.id, position.name, position.func_name)
+        end
     end
 end
 

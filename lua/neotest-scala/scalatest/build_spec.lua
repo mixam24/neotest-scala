@@ -90,7 +90,6 @@ end
 ---@return TestArguments
 local function test_arguments(tree)
     local node = tree:data()
-    print(vim.inspect(node))
     if node.type == "test" then
         local split_position = string.find(node.id, "::")
         return { class = string.sub(node.id, 1, split_position), name = string.sub(node.id, split_position + 2) }
@@ -121,7 +120,6 @@ local function build_command(runner, project, tree, path)
         else
             cli_args = { "-o", arguments.class, "--", "-fJ", path }
         end
-        print(vim.inspect(cli_args))
         return vim.tbl_flatten({ "bloop", "test", project, cli_args })
     end
     if not arguments.class then
@@ -141,9 +139,9 @@ end
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
 return function(runner, args)
     local position = args.tree:data()
-    if position.type == "dir" then
+    if lib.func_util.index({ "dir", "file" }, position.type) then
         -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
-        -- I.e. it is not safe to build spec for dir and we need to process each test file in dir.
+        -- I.e. it is not safe to build spec for dir or file and we need to process each test file in dir.
         -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
         return nil
     end

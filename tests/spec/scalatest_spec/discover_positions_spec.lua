@@ -54,7 +54,7 @@ describe("Basic scenarios", function()
                 })
                 assert.array(list[2]).has.no.holes(2)
                 assert.are_equal(
-                    "scala.scalatest.basic.WordSpec::A Set empty produce NoSuchElementException when head is invoked",
+                    "scala.scalatest.basic.WordSpec::A Set when empty should produce NoSuchElementException when head is invoked",
                     list[2][2][2][3][1].id
                 )
             end)

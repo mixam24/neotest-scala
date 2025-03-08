@@ -33,9 +33,10 @@ return function(spec, _, _)
         -- Test: <Package name>.<Class name>::<Test name>
         -- my.package.name.SetSuite::An empty Set should have size 0
         local id = event.suiteClassName .. "::" .. event.testName
-        results[id] = { status = status, output = spec.context.results_path }
+        results[id] = { status = status }
         if error_msg then
             results[id]["errors"] = { line = error_line, message = error_msg }
+            results[id]["short"] = error_msg
         end
           -- stylua: ignore start
           ::continue::
