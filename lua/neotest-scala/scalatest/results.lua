@@ -3,10 +3,14 @@ local lib = require("neotest.lib")
 
 ---@async
 ---@param spec neotest.RunSpec
+---@param result neotest.StrategyResult
 ---@return table<string, neotest.Result>
-return function(spec, _, _)
+return function(spec, result, _)
     local success, lines = pcall(lib.files.read_lines, spec.context.results_path)
     if not success then
+        if result.code ~= 0 then
+            error(lib.files.read(result.output), vim.log.levels.ERROR)
+        end
         return {}
     end
     local results = {}
