@@ -1,85 +1,6 @@
 local nio = require("nio")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
-local tresitter = require("neotest.lib.treesitter")
-local utils = require("neotest-scala.utils")
-local types = require("neotest.types")
-
----Retrieves scala package identifiers from the given file
----@param file_path string: file path
----@return table: list of packages found
-local function package_names(file_path)
-    local query = [[
-           ; -- Query --
-           (package_clause
-            name: (package_identifier) @test.name
-           ) @test.definition
-           ]]
-    local packages = {}
-    ---@diagnostic disable: missing-fields
-    local tree = tresitter.parse_positions(file_path, query, { nested_tests = true, require_namespaces = false })
-    ---@diagnostic enable: missing-fields
-    for _, child in tree:iter_nodes() do
-        local data = child:data()
-        if data.type == "test" then
-            table.insert(packages, 1, data.name)
-        end
-    end
-    local length = #packages
-    if length == 0 then
-        error(("Con't find package name in '%s' file").format(file_path), vim.log.levels.ERROR)
-    end
-    if length > 1 then
-        -- TODO: current assumption/limitation is that file contains exactly one package
-        error(("More than one package name found in '%s' file").format(file_path), vim.log.levels.ERROR)
-    end
-    return packages
-end
-
-local function suite_names(file_path)
-    local query = [[
-          ; Matches: `object 'Name' ...`
-          (object_definition
-           name: (identifier) @test.name)
-           @test.definition
-
-          ; Matches: `class 'Name' ...`
-          (class_definition
-          name: (identifier) @test.name)
-          @test.definition
-           ]]
-    local suites = {}
-    local opts = { nested_tests = true, require_namespaces = false }
-    local tree = tresitter.parse_positions(file_path, query, opts)
-    for _, child in tree:iter_nodes() do
-        local data = child:data()
-        if data.type == "test" then
-            table.insert(suites, 1, data.name)
-        end
-    end
-    local length = #suites
-    if length == 0 then
-        error(string.format("Can't find any suite in '%s' file", file_path), vim.log.levels.ERROR)
-    end
-    return suites
-end
-
----comment
----@param tree neotest.Tree Neotest tree to traverse
----@return TestArguments[]
-local function suite_arguments(tree)
-    local node = tree:data()
-    if not node.type == "file" then
-        error(string.format("Expected to receive a node of type 'file' but got '%s'", node.type, vim.log.levels.ERROR))
-    end
-    local package = package_names(node.path)[1]
-    local suites = suite_names(node.path)
-    local arguments = {}
-    for _, suite in pairs(suites) do
-        table.insert(arguments, { class = package .. "." .. suite })
-    end
-    return arguments
-end
 
 ---@class TestArguments
 ---@field name string|nil
@@ -95,8 +16,6 @@ local function test_arguments(tree)
         return { class = string.sub(node.id, 1, split_position - 1), name = string.sub(node.id, split_position + 2) }
     elseif node.type == "namespace" then
         return { class = node.id }
-    elseif node.type == "file" then
-        return { pkg = node.id }
     else
         -- It should never happen...
         error("Should never happen...", vim.log.levels.ERROR)
@@ -122,10 +41,10 @@ local function build_command(runner, project, tree, path)
         end
         return vim.tbl_flatten({ "bloop", "test", "--no-color", project, cli_args })
     end
+    -- TODO: Make sure that sbt also works + add tests...
     if not arguments.class then
         return vim.tbl_flatten({ "sbt", project .. "/test", "--", "-fJ", path })
     end
-    -- TODO: Run sbt with colors, but figure out wich ainsi sequence need to be matched.
     return vim.tbl_flatten({
         "sbt",
         "--no-colors",
@@ -143,6 +62,8 @@ return function(runner, args)
         -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
         -- I.e. it is not safe to build spec for dir or file and we need to process each test file in dir.
         -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
+        -- TODO: consider to add a config property to inform plugin that package names follow directory
+        --  structure names.
         return nil
     end
     assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
