@@ -92,7 +92,7 @@ local function test_arguments(tree)
     local node = tree:data()
     if node.type == "test" then
         local split_position = string.find(node.id, "::")
-        return { class = string.sub(node.id, 1, split_position), name = string.sub(node.id, split_position + 2) }
+        return { class = string.sub(node.id, 1, split_position - 1), name = string.sub(node.id, split_position + 2) }
     elseif node.type == "namespace" then
         return { class = node.id }
     elseif node.type == "file" then
@@ -120,7 +120,7 @@ local function build_command(runner, project, tree, path)
         else
             cli_args = { "-o", arguments.class, "--", "-fJ", path }
         end
-        return vim.tbl_flatten({ "bloop", "test", project, cli_args })
+        return vim.tbl_flatten({ "bloop", "test", "--no-color", project, cli_args })
     end
     if not arguments.class then
         return vim.tbl_flatten({ "sbt", project .. "/test", "--", "-fJ", path })

@@ -16,7 +16,7 @@ class WordSpec extends AnyWordSpec {
         }
       }
       "and this one will always fail" in {
-        assert(1 == 0)
+        assert(1 == 0, "Here we go...")
       }
     }
   }

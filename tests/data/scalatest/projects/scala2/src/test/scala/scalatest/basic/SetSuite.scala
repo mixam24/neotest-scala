@@ -14,6 +14,6 @@ class SetSuite extends AnyFunSuite {
     }
   }
   test("This one will always fail") {
-    assert(1 == 0)
+    assert(1 == 0, "Oh no...")
   }
 }

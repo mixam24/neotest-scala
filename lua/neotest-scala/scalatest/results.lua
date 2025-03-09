@@ -1,5 +1,6 @@
 local types = require("neotest.types")
 local lib = require("neotest.lib")
+local utils = require("neotest.lib.func_util")
 
 ---@async
 ---@param spec neotest.RunSpec
@@ -24,8 +25,17 @@ return function(spec, result, _)
         elseif event.eventType == "TestFailed" then
             status = types.ResultStatus.failed
             local trace_position = event.throwable.depth + 1
-            error_msg = event.throwable.stackTraces[trace_position].toString
-            error_line = event.throwable.stackTraces[trace_position].lineNumber
+            error_msg = table.concat({
+                event.throwable.message or "",
+                table.concat(
+                    utils.map(function(k, v)
+                        return k, v.toString
+                    end, event.throwable.stackTraces),
+                    "\n",
+                    trace_position
+                ),
+            }, "\n")
+            error_line = event.throwable.stackTraces[trace_position].lineNumber - 1
         elseif event.eventType == "TestSkipped" then
             status = types.ResultStatus.skipped
         else
@@ -37,9 +47,9 @@ return function(spec, result, _)
         -- Test: <Package name>.<Class name>::<Test name>
         -- my.package.name.SetSuite::An empty Set should have size 0
         local id = event.suiteClassName .. "::" .. event.testName
-        results[id] = { status = status }
+        results[id] = { status = status, errors = {} }
         if error_msg then
-            results[id]["errors"] = { line = error_line, message = error_msg }
+            table.insert(results[id]["errors"], { line = error_line, message = error_msg })
             results[id]["short"] = error_msg
         end
           -- stylua: ignore start
