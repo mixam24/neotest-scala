@@ -22,12 +22,12 @@ describe("Basic scenarios", function()
                     id = file_path,
                     name = "SetSuite.scala",
                     path = file_path,
-                    range = { 0, 0, 19, 0 },
+                    range = { 0, 0, 36, 0 },
                     type = "file",
                 })
                 assert.array(list[2]).has.no.holes(2)
                 assert.are_equal(
-                    "scala.scalatest.basic.SetSuite::Invoking head on an empty Set should produce NoSuchElementException",
+                    "neotest.scala.basic.SetSuite::Invoking head on an empty Set should produce NoSuchElementException",
                     list[2][3][1].id
                 )
             end)
@@ -54,7 +54,7 @@ describe("Basic scenarios", function()
                 })
                 assert.array(list[2]).has.no.holes(2)
                 assert.are_equal(
-                    "scala.scalatest.basic.WordSpec::A Set when empty should produce NoSuchElementException when head is invoked",
+                    "neotest.scala.basic.WordSpec::A Set when empty should produce NoSuchElementException when head is invoked",
                     list[2][2][2][3][1].id
                 )
             end)

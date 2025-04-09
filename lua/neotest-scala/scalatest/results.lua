@@ -19,23 +19,28 @@ return function(spec, result, _)
         local event = vim.json.decode(line, { luanil = { object = true } })
         local status
         local error_msg
-        local error_line
+        local error_line = -1
         if event.eventType == "TestSucceeded" then
             status = types.ResultStatus.passed
         elseif event.eventType == "TestFailed" then
             status = types.ResultStatus.failed
-            local trace_position = event.throwable.depth + 1
-            error_msg = table.concat({
-                event.throwable.message or "",
-                table.concat(
-                    utils.map(function(k, v)
-                        return k, v.toString
-                    end, event.throwable.stackTraces),
-                    "\n",
-                    trace_position
-                ),
-            }, "\n")
-            error_line = event.throwable.stackTraces[trace_position].lineNumber - 1
+            local traces = { event.throwable.message or "" }
+            local trace_position
+            if event.throwable.stackTraces then
+                for k, v in pairs(event.throwable.stackTraces) do
+                    table.insert(traces, v.toString)
+                    if v.className == event.suiteClassName then
+                        error_line = v.lineNumber - 1
+                        goto continue
+                    end
+                    if error_line > 0 then
+                        trace_position = k
+                        break
+                    end
+                    ::continue::
+                end
+            end
+            error_msg = table.concat(traces, "\n", 1, trace_position)
         elseif event.eventType == "TestSkipped" then
             status = types.ResultStatus.skipped
         else
@@ -52,9 +57,7 @@ return function(spec, result, _)
             table.insert(results[id]["errors"], { line = error_line, message = error_msg })
             results[id]["short"] = error_msg
         end
-          -- stylua: ignore start
-          ::continue::
-        -- stylua: ignore end
+        ::continue::
     end
     return results
 end

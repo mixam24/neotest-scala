@@ -1,4 +1,4 @@
-package scala.scalatest.basic
+package neotest.scala.basic;
 
 import org.scalatest.wordspec.AnyWordSpec
 
