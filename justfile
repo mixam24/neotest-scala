@@ -1,7 +1,7 @@
 test:
     ./scripts/test
 
-run-scala2-project-tests:
+run-scala2-project-tests runner='bloop':
     #!/usr/bin/env bash
     set -euxo pipefail
 
@@ -10,4 +10,9 @@ run-scala2-project-tests:
 
     cd "${PROJECT_DIR}"
     sbt bloopInstall
-    bloop test -p scala2 -- -fJ "${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 32 ]
+    if [ "{{runner}}" == "sbt" ]
+    then
+      sbt test -- -fJ "${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 1 ]
+    else
+      bloop test -p scala2 -- -fJ "${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 32 ]
+    fi
