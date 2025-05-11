@@ -4,12 +4,6 @@ local scala = require("neotest-scala")({
     runner = "bloop",
 })
 local async = require("neotest-busted.async")
-local client = require("neotest.client")({
-    require("neotest-scala")({
-        framework = "scalatest",
-        runner = "bloop",
-    }),
-})
 describe("Basic scenarios", function()
     it(
         "should process results file and return statuses",

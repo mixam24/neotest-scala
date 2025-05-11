@@ -29,28 +29,40 @@ end
 ---@param path string Path to the temp file for results output
 ---@return string[]
 local function build_command(runner, project, tree, path)
-    local arguments = test_arguments(tree)
+    local runner_args
+    local test_command_args = {}
+    local framework_args = { "--", "-fJ", path }
+
     if runner == "bloop" then
-        local cli_args
-        if arguments.pkg then
-            cli_args = { "-m", arguments.pkg, "--", "-fJ", path }
-        elseif arguments.name then
-            cli_args = { "-o", arguments.class, "--", "-fJ", path, "-z", arguments.name }
+        runner_args = { "bloop", "test", "--no-color", project }
+    elseif runner == "sbt" then
+        runner_args = { "sbt", "--no-colors", project .. "/testOnly" }
+    else
+        error("Should never happen...", vim.log.levels.ERROR)
+    end
+
+    local arguments = test_arguments(tree)
+    if arguments.pkg then
+        if runner == "sbt" then
+            test_command_args = { arguments.pkg }
         else
-            cli_args = { "-o", arguments.class, "--", "-fJ", path }
+            framework_args = vim.tbl_flatten({ framework_args, "-m", arguments.pkg })
         end
-        return vim.tbl_flatten({ "bloop", "test", "--no-color", project, cli_args })
+    elseif arguments.name then
+        if runner == "sbt" then
+            test_command_args = { arguments.class }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
+        end
+        framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
+    else
+        if runner == "sbt" then
+            test_command_args = { arguments.class }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
+        end
     end
-    -- TODO: Make sure that sbt also works + add tests...
-    if not arguments.class then
-        return vim.tbl_flatten({ "sbt", project .. "/test", "--", "-fJ", path })
-    end
-    return vim.tbl_flatten({
-        "sbt",
-        "--no-colors",
-        project .. "/testOnly ",
-        { "--", "-fJ", path, "-z", string.format('"%s"', arguments.name) },
-    })
+    return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
 end
 
 ---@param runner string Name of the runner

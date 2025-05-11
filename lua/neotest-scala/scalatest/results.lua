@@ -1,6 +1,5 @@
 local types = require("neotest.types")
 local lib = require("neotest.lib")
-local utils = require("neotest.lib.func_util")
 
 ---@async
 ---@param spec neotest.RunSpec
@@ -27,7 +26,7 @@ return function(spec, result, _)
             local traces = { event.throwable.message or "" }
             local trace_position
             if event.throwable.stackTraces then
-                for k, v in pairs(event.throwable.stackTraces) do
+                for k, v in ipairs(event.throwable.stackTraces) do
                     table.insert(traces, v.toString)
                     if v.className == event.suiteClassName then
                         error_line = v.lineNumber - 1
