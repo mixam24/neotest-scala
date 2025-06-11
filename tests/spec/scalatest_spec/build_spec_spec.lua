@@ -4,6 +4,20 @@ local bloop = require("neotest-scala")({
     runner = "bloop",
 })
 local async = require("neotest-busted.async")
+
+before_each(function()
+    local common = require("neotest-scala.common.build_spec")
+    ---@diagnostic disable-next-line duplicate-set-field
+    common.get_project_name = function()
+        return "project"
+    end
+    package.loaded["neotest-scala.common.build_spec"] = common
+end)
+
+after_each(function()
+    package.loaded["neotest-scala.common.build_spec"] = nil
+end)
+
 describe("Bloop scenarios", function()
     it(
         "Emit nil when root points to a dir",
@@ -61,16 +75,17 @@ describe("Bloop scenarios", function()
         "Emit command when root points to a test scenario",
         async(function()
             -- GIVEN
+
             local tree = types.Tree.from_list({
                 {
-                    id = "id",
-                    name = "WordSpec.scala",
+                    id = "neotest.scala.basic.WordSpec",
+                    name = "WordSpec",
                     path = "path/to/the/WordSpec.scala",
-                    range = { 0, 0, 23, 0 },
+                    range = { 4, 0, 22, 1 },
                     type = "namespace",
                 },
             }, function(_)
-                return "id"
+                return "neotest.scala.basic.WordSpec"
             end)
 
             -- WHEN
@@ -81,7 +96,8 @@ describe("Bloop scenarios", function()
             })
 
             -- THEN
-            assert.are_nil(result, "Result is not nil")
+            assert.are(result, "Result is not nil")
+            -- TODO: perform actual assertion...
         end)
     )
     it("Emit command when root point to a test suite", async(function() end))
