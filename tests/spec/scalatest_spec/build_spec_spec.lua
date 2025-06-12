@@ -12,10 +12,16 @@ before_each(function()
         return "project"
     end
     package.loaded["neotest-scala.common.build_spec"] = common
+    local nio = require("nio")
+    nio.fn.tempname = function()
+        return "tempfile"
+    end
+    package.loaded["nio"] = nio
 end)
 
 after_each(function()
     package.loaded["neotest-scala.common.build_spec"] = nil
+    package.loaded["nio"] = nil
 end)
 
 describe("Bloop scenarios", function()
@@ -72,7 +78,7 @@ describe("Bloop scenarios", function()
         end)
     )
     it(
-        "Emit command when root points to a test scenario",
+        "Emit command when root point to a test suite",
         async(function()
             -- GIVEN
 
@@ -96,9 +102,30 @@ describe("Bloop scenarios", function()
             })
 
             -- THEN
-            assert.are(result, "Result is not nil")
-            -- TODO: perform actual assertion...
+            assert.are(result, "Result is nil")
+            assert.are_same({
+                "bloop",
+                "test",
+                "--no-color",
+                "project",
+                "--",
+                "-fJ",
+                require("nio").fn.tempname(),
+                "-s",
+                "neotest.scala.basic.WordSpec",
+            }, result.command, "Not what expected as command")
+            assert.are_same(
+                { results_path = require("nio").fn.tempname() },
+                result.context,
+                "Not what expected as context"
+            )
         end)
     )
-    it("Emit command when root point to a test suite", async(function() end))
+    it(
+        "Emit command when root points to a test scenario",
+        async(function()
+            --- TODO: add missed test case!
+            assert.are_equals(true, true)
+        end)
+    )
 end)
