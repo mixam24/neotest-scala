@@ -12,7 +12,7 @@ local opts = minit.busted.setup({
         "lunarmodules/luacov",
         "williamboman/mason-lspconfig.nvim",
         "williamboman/mason.nvim",
-        "nvim-treesitter/nvim-treesitter",
+        { "nvim-treesitter/nvim-treesitter", opts = { ensure_installed = { "scala" } } },
         "nvim-neotest/nvim-nio",
         "nvim-lua/plenary.nvim",
         "nvim-neotest/neotest",
