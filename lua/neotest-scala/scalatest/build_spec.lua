@@ -36,7 +36,7 @@ local function build_command(runner, project, tree, path)
     if runner == "bloop" then
         runner_args = { "bloop", "test", "--no-color", project }
     elseif runner == "sbt" then
-        runner_args = { "sbt", "--batch", "--no-colors", project .. "/testOnly" }
+        runner_args = { "sbt", "--no-colors", project .. "/testOnly" }
     else
         error("Should never happen...", vim.log.levels.ERROR)
     end
