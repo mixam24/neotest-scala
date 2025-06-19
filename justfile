@@ -1,7 +1,7 @@
 test:
     ./scripts/test
 
-run-scala2-project-tests runner='bloop':
+run-scalatest-project-tests runner='bloop':
     #!/usr/bin/env bash
     set -euxo pipefail
 
