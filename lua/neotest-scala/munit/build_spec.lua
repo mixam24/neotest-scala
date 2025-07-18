@@ -1,4 +1,6 @@
 local utils = require("neotest-scala.utils")
+local lib = require("neotest.lib")
+local common = require("neotest-scala.common.build_spec")
 
 -- Builds a test path from the current position in the tree.
 ---@param tree neotest.Tree
@@ -41,14 +43,24 @@ local function build_test_path(tree, name)
     return nil
 end
 
---- Builds a command for running tests for the framework.
----@param runner string
----@param project string
----@param tree neotest.Tree
----@param name string
----@param extra_args table|string
----@return string[]
-return function(runner, project, tree, name, extra_args)
-    local test_path = build_test_path(tree, name)
-    return utils.build_command_with_test_path(project, runner, test_path, extra_args)
+---@param runner string Name of the runner
+---@param args neotest.RunArgs
+---@return nil | neotest.RunSpec | neotest.RunSpec[]
+return function(runner, args)
+    local position = args.tree:data()
+    if lib.func_util.index({ "dir", "file" }, position.type) then
+        -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
+        -- I.e. it is not safe to build spec for dir or file and we need to process each test file in dir.
+        -- Source: https://docs.scala-lang.org/scala3/book/packaging-imports.html
+        -- TODO: consider to add a config property to inform plugin that package names follow directory
+        --  structure names.
+        return nil
+    end
+    assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
+    local project = common.get_project_name(position.path, runner)
+    assert(project, "scala project not found in the build file")
+    local test_path = build_test_path(args.tree, utils.get_position_name(position))
+    local command = utils.build_command_with_test_path(project, runner, test_path, {})
+    local strategy = common.get_strategy_config(args.strategy, args.tree, project)
+    return { command = command, strategy = strategy }
 end

@@ -59,10 +59,6 @@ local function get_results(tree, test_results)
             results[node.id] = { status = types.ResultStatus.failed }
         else
             local name = string.gsub(string.sub(node.id, string.len(node.path), -1), "::", " ")
-            print(name)
-            if events[name] then
-                print(vim.inspect(events[name]))
-            end
         end
     end
     return results
@@ -80,9 +76,6 @@ return function(spec, result, tree)
     end
     for _, child in tree:iter_nodes() do
         local data = child:data()
-        if data.type ~= "test" then
-            print(vim.inspect(data))
-        end
     end
     local test_results = get_test_results(lines)
     return get_results(tree, test_results)

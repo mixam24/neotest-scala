@@ -76,6 +76,8 @@ setmetatable(Adapter, {
         local impl = {}
         if opts.framework == "scalatest" then
             impl = require("neotest-scala.scalatest")
+        elseif opts.framework == "munit" then
+            impl = require("neotest-scala.munit")
         else
             error("Not implemented yet!", vim.log.levels.ERROR)
         end
