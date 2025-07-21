@@ -55,7 +55,6 @@ local function get_results(tree, test_results)
     for _, node in tree:iter_nodes() do
         local node = node:data()
         if no_results then
-            print("No results...")
             results[node.id] = { status = types.ResultStatus.failed }
         else
             local name = string.gsub(string.sub(node.id, string.len(node.path), -1), "::", " ")

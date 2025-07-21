@@ -2,45 +2,68 @@ local utils = require("neotest-scala.utils")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
 
--- Builds a test path from the current position in the tree.
+---@class TestArguments
+---@field name string|nil
+---@field class string|nil
+---@field pkg string|nil
+
+---@param tree neotest.Tree Neotest tree to traverse
+---@return TestArguments
+local function test_arguments(tree)
+    local node = tree:data()
+    if node.type == "test" then
+        local split_position = string.find(node.id, "::")
+        return { class = string.sub(node.id, 1, split_position - 1), name = string.sub(node.id, split_position + 2) }
+    elseif node.type == "namespace" then
+        return { class = node.id }
+    else
+        -- It should never happen...
+        error("Should never happen...", vim.log.levels.ERROR)
+    end
+end
+
+--- Builds a command for running tests for the framework.
+---@param runner string
+---@param project string
 ---@param tree neotest.Tree
----@param name string
----@return string|nil
-local function build_test_path(tree, name)
-    local parent_tree = tree:parent()
-    local type = tree:data().type
-    if parent_tree and parent_tree:data().type == "namespace" then
-        local package = utils.get_package_name(parent_tree:data().path)
-        local parent_name = parent_tree:data().name
-        return package .. parent_name .. "." .. name
+---@return string[]
+local function build_command(runner, project, tree)
+    local runner_args
+    local test_command_args = {}
+    local framework_args = { "--" }
+
+    if runner == "bloop" then
+        runner_args = { "bloop", "test", project }
+    elseif runner == "sbt" then
+        runner_args = { "sbt", project .. "/testOnly" }
+    else
+        error("Should never happen...", vim.log.levels.ERROR)
     end
-    if parent_tree and parent_tree:data().type == "test" then
-        local parent_pos = parent_tree:data()
-        return build_test_path(parent_tree, utils.get_position_name(parent_pos)) .. "." .. name
-    end
-    if type == "namespace" then
-        local package = utils.get_package_name(tree:data().path)
-        if not package then
-            return nil
+
+    local arguments = test_arguments(tree)
+    --- TODO: should we remove pkg from the TestArguments?
+    ---  It is not in use...
+    if arguments.pkg then
+        if runner == "sbt" then
+            test_command_args = { arguments.pkg }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, string.format([["%s.*"]], arguments.pkg) })
         end
-        return package .. name .. ".*"
-    end
-    if type == "file" then
-        local test_suites = {}
-        for _, child in tree:iter_nodes() do
-            if child:data().type == "namespace" then
-                table.insert(test_suites, child:data().name)
-            end
+    elseif arguments.name then
+        if runner == "sbt" then
+            test_command_args = { string.format('"%s.%s"', arguments.class, arguments.name) }
+        else
+            framework_args =
+                vim.tbl_flatten({ framework_args, string.format("%s.%s", arguments.class, arguments.name) })
         end
-        if test_suites then
-            local package = utils.get_package_name(tree:data().path)
-            return package .. "*"
+    else
+        if runner == "sbt" then
+            test_command_args = { string.format("%s.*", arguments.class) }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, string.format("%s.*", arguments.class) })
         end
     end
-    if type == "dir" then
-        return "*"
-    end
-    return nil
+    return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
 end
 
 ---@param runner string Name of the runner
@@ -59,8 +82,11 @@ return function(runner, args)
     assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
     local project = common.get_project_name(position.path, runner)
     assert(project, "scala project not found in the build file")
-    local test_path = build_test_path(args.tree, utils.get_position_name(position))
-    local command = utils.build_command_with_test_path(project, runner, test_path, {})
+    local command = build_command(runner, project, args.tree)
     local strategy = common.get_strategy_config(args.strategy, args.tree, project)
-    return { command = command, strategy = strategy }
+    return {
+        command = command,
+        strategy = strategy,
+        context = {},
+    }
 end
