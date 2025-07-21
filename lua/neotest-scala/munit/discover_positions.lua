@@ -79,20 +79,6 @@ return function(path)
       function: (identifier) @test.func_name (#match? @test.func_name "test")
       arguments: (arguments (string) @test.name))
     )) @test.definition
-
-    ; Matches: `"name" should / "name" when`
-    ((infix_expression
-      left: (string) @test.name
-      operator: (identifier) @test.func_name (#any-of? @test.func_name "should" "when")
-      right: (block)
-    )) @test.definition
-
-    ; Matches: `"name" in`
-    ((infix_expression
-      left: (string) @test.name
-      operator: (identifier) @test.func_name (#eq? @test.func_name "in")
-      right: (block)
-    )) @test.definition
     ]]
 
     local packages = pkgs.discover_packages(path)
