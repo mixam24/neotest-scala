@@ -47,7 +47,7 @@ local function build_command(runner, project, tree)
         if runner == "sbt" then
             test_command_args = { arguments.pkg }
         else
-            framework_args = vim.tbl_flatten({ framework_args, string.format([["%s.*"]], arguments.pkg) })
+            framework_args = vim.tbl_flatten({ framework_args, string.format("%s.*", arguments.pkg) })
         end
     elseif arguments.name then
         if runner == "sbt" then
