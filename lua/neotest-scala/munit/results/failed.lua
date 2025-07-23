@@ -16,7 +16,7 @@ local error_message = vim.lpeg.Cg((code.any - color.ALL) ^ 0, "error_message")
 local runtime_class_name =
     vim.lpeg.Cg(((code.alpha_numeric + vim.lpeg.P("$")) ^ 1 * code.dot ^ 0) ^ 1, "runtime_class_name")
 --- We may want to change it in future...
-local filename = code.any ^ 1
+local filename = (code.any - color.ALL) ^ 1
 local erorr_line = vim.lpeg.Cg(code.numeric ^ 1, "erorr_line")
 
 M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * code.spaces)
@@ -31,7 +31,10 @@ M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * 
 ---@param line string Colored stack trace line of text
 ---@return string
 M.cleaned_trace_line = function(line)
-    local pattern = vim.lpeg.Cs(((code.any - color.ALL) / vim.lpeg.P("") + 1) ^ 0)
+    --- Any matched color code passed to the function...
+    local pattern = vim.lpeg.Cs((color.ALL / function(_)
+        return ""
+    end + 1) ^ 0)
     return vim.lpeg.match(pattern, line)
 end
 

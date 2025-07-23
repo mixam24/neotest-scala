@@ -7,8 +7,18 @@ M.color.light_red = vim.lpeg.P("\x1B[91m")
 M.color.normal = vim.lpeg.P("\x1B[0m")
 M.color.high_intensity = vim.lpeg.P("\x1B[1m")
 
+local COLORS = nil
+for _, value in pairs(M.color) do
+    if COLORS == nil then
+        COLORS = value
+    else
+        COLORS = COLORS + value
+    end
+end
+
 ---@type vim.lpeg.Pattern
-M.color.ALL = M.color.green + M.color.faint + M.color.light_red + M.color.normal + M.color.high_intensity
+M.color.ALL = COLORS
+
 --- ALPHA-NUMERIC CODES
 M.code = {}
 M.code.alpha_numeric = vim.lpeg.R("az", "AZ", "09")
