@@ -5,14 +5,15 @@ M.color.green = vim.lpeg.P("\x1B[32m")
 M.color.faint = vim.lpeg.P("\x1B[90m")
 M.color.light_red = vim.lpeg.P("\x1B[91m")
 M.color.normal = vim.lpeg.P("\x1B[0m")
+M.color.high_intensity = vim.lpeg.P("\x1B[1m")
 
-M.color.ALL = M.color.green + M.color.faint + M.color.light_red + M.color.normal
-
+---@type vim.lpeg.Pattern
+M.color.ALL = M.color.green + M.color.faint + M.color.light_red + M.color.normal + M.color.high_intensity
 --- ALPHA-NUMERIC CODES
 M.code = {}
 M.code.alpha_numeric = vim.lpeg.R("az", "AZ", "09")
 M.code.numeric = vim.lpeg.R("09")
-M.code.dot = vim.lpeg.S(".")
+M.code.dot = vim.lpeg.P(".")
 M.code.spaces = vim.lpeg.P(" ") ^ 1
 M.code.any = vim.lpeg.P(1)
 

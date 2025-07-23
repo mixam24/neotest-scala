@@ -29,8 +29,8 @@ run-munit-project-tests runner='bloop':
     cd "${PROJECT_DIR}"
     if [ "{{runner}}" == "sbt" ]
     then
-      sbt -java-home "{{java-home}}" test -- -c -F &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
+      sbt -java-home "{{java-home}}" test &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
     else
       sbt -java-home "{{java-home}}" bloopInstall
-      bloop test -p scala2 -- -c -F &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
+      bloop test -p scala2 &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
     fi

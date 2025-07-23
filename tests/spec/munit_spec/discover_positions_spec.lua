@@ -28,4 +28,45 @@ describe("Basic scenarios", function()
             assert.are_equal("neotest.basic.BasicSuite::An empty Set should have size 0", list[2][2][1].id)
         end)
     )
+    it(
+        "should find positions with fail mark",
+        async(function()
+            --- TODO: add test
+        end)
+    )
+    it(
+        "should find positions with pending mark",
+        async(function()
+
+            --- TODO: add test
+        end)
+    )
+    it(
+        "should find positions with tag mark",
+        async(function()
+
+            --- TODO: add test
+        end)
+    )
+    it(
+        "should find positions with flaky mark",
+        async(function()
+
+            --- TODO: add test
+        end)
+    )
+    it(
+        "should find positions with only mark",
+        async(function()
+
+            --- TODO: add test
+        end)
+    )
+    it(
+        "should find positions with ignore mark",
+        async(function()
+
+            --- TODO: add test
+        end)
+    )
 end)

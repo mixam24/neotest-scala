@@ -1,234 +1,32 @@
 [32mneotest.basic.BasicSuite:[0m
 [32m  + [0m[32mAn empty Set should have size 0[0m [90m0.02s[0m
-[32m  + [0m[32mInvoking head on an empty Set should produce NoSuchElementException[0m [90m0.003s[0m
-[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mThis one will always fail[0m  [90m0.02s[0m /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/src/test/scala/munit/basic/BasicSuite.scala:20 Oh no...
+[32m  + [0m[32mInvoking head on an empty Set should produce NoSuchElementException[0m [90m0.002s[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mThis one will always fail[0m  [90m0.025s[0m munit.FailException: /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/src/test/scala/munit/basic/BasicSuite.scala:20 Oh no...
 19:  test("This one will always fail") {
 [7m20:    assert(1 == 0, "Oh no...")[0m
 21:  }
-[90m    at [0m[90mmunit.Assertions.fail[0m[90m([0m[90mAssertions.scala[0m:[90m256[0m[90m)[0m
-[90m    at [0m[90mmunit.Assertions.fail$[0m[90m([0m[90mAssertions.scala[0m:[90m250[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.fail[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.Assertions.$anonfun$assert$1[0m[90m([0m[90mAssertions.scala[0m:[90m33[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropInside[0m[90m([0m[90mStackTraces.scala[0m:[90m10[0m[90m)[0m
-[90m    at [0m[90mmunit.Assertions.assert[0m[90m([0m[90mAssertions.scala[0m:[90m30[0m[90m)[0m
-[90m    at [0m[90mmunit.Assertions.assert$[0m[90m([0m[90mAssertions.scala[0m:[90m26[0m[90m)[0m
 [90m    at [0m[90mmunit.FunSuite.assert[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
 [1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$5[0m[1m([0m[1mBasicSuite.scala[0m:[1m20[0m[1m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.$anonfun$munitValueTransform$3[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mscala.util.Try$.apply[0m[90m([0m[90mTry.scala[0m:[90m217[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform$[0m[90m([0m[90mValueTransforms.scala[0m:[90m22[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.munitValueTransform[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$2[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$$anon$3.run[0m[90m([0m[90mPlatformCompat.scala[0m:[90m69[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$.waitAtMost[0m[90m([0m[90mPlatformCompat.scala[0m:[90m67[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.waitForCompletion[0m[90m([0m[90mFunSuite.scala[0m:[90m51[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$1[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTestBody$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m347[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTestBody[0m[90m([0m[90mMUnitRunner.scala[0m:[90m343[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTest[0m[90m([0m[90mMUnitRunner.scala[0m:[90m324[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTests$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mscala.collection.Iterator$$anon$9.next[0m[90m([0m[90mIterator.scala[0m:[90m584[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.loop$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m160[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.sequenceFutures[0m[90m([0m[90mMUnitRunner.scala[0m:[90m173[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTests[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runAll$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m188[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAll[0m[90m([0m[90mMUnitRunner.scala[0m:[90m185[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAsync[0m[90m([0m[90mMUnitRunner.scala[0m:[90m130[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.run[0m[90m([0m[90mMUnitRunner.scala[0m:[90m121[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.junitinterface.JUnitRunnerWrapper.run[0m[90m([0m[90mJUnitRunnerWrapper.java[0m:[90m24[0m[90m)[0m
-    ...
-[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that throw NotImplemented[0m  [90m0.001s[0m Not implemented!
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that throw NotImplemented[0m  [90m0.002s[0m scala.NotImplementedError: Not implemented!
 [1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
 [1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$8[0m[1m([0m[1mBasicSuite.scala[0m:[1m23[0m[1m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.$anonfun$munitValueTransform$3[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mscala.util.Try$.apply[0m[90m([0m[90mTry.scala[0m:[90m217[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform$[0m[90m([0m[90mValueTransforms.scala[0m:[90m22[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.munitValueTransform[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$2[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$$anon$3.run[0m[90m([0m[90mPlatformCompat.scala[0m:[90m69[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$.waitAtMost[0m[90m([0m[90mPlatformCompat.scala[0m:[90m67[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.waitForCompletion[0m[90m([0m[90mFunSuite.scala[0m:[90m51[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$1[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTestBody$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m347[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTestBody[0m[90m([0m[90mMUnitRunner.scala[0m:[90m343[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTest[0m[90m([0m[90mMUnitRunner.scala[0m:[90m324[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTests$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mscala.collection.Iterator$$anon$9.next[0m[90m([0m[90mIterator.scala[0m:[90m584[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.loop$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m160[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.sequenceFutures[0m[90m([0m[90mMUnitRunner.scala[0m:[90m173[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTests[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runAll$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m188[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAll[0m[90m([0m[90mMUnitRunner.scala[0m:[90m185[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAsync[0m[90m([0m[90mMUnitRunner.scala[0m:[90m130[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.run[0m[90m([0m[90mMUnitRunner.scala[0m:[90m121[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.junitinterface.JUnitRunnerWrapper.run[0m[90m([0m[90mJUnitRunnerWrapper.java[0m:[90m24[0m[90m)[0m
-    ...
-[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a nested function that throw NotImplemented[0m  [90m0.001s[0m Not implemented!
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a nested function that throw NotImplemented[0m  [90m0.001s[0m scala.NotImplementedError: Not implemented!
 [1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
 [1m    at [0m[1mneotest.scala.Testable$.nestedFunction[0m[1m([0m[1mTestable.scala[0m:[1m10[0m[1m)[0m
 [1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$9[0m[1m([0m[1mBasicSuite.scala[0m:[1m26[0m[1m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.$anonfun$munitValueTransform$3[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mscala.util.Try$.apply[0m[90m([0m[90mTry.scala[0m:[90m217[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform$[0m[90m([0m[90mValueTransforms.scala[0m:[90m22[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.munitValueTransform[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$2[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$$anon$3.run[0m[90m([0m[90mPlatformCompat.scala[0m:[90m69[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$.waitAtMost[0m[90m([0m[90mPlatformCompat.scala[0m:[90m67[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.waitForCompletion[0m[90m([0m[90mFunSuite.scala[0m:[90m51[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$1[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTestBody$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m347[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTestBody[0m[90m([0m[90mMUnitRunner.scala[0m:[90m343[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTest[0m[90m([0m[90mMUnitRunner.scala[0m:[90m324[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTests$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mscala.collection.Iterator$$anon$9.next[0m[90m([0m[90mIterator.scala[0m:[90m584[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.loop$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m160[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.sequenceFutures[0m[90m([0m[90mMUnitRunner.scala[0m:[90m173[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTests[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runAll$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m188[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAll[0m[90m([0m[90mMUnitRunner.scala[0m:[90m185[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAsync[0m[90m([0m[90mMUnitRunner.scala[0m:[90m130[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.run[0m[90m([0m[90mMUnitRunner.scala[0m:[90m121[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.junitinterface.JUnitRunnerWrapper.run[0m[90m([0m[90mJUnitRunnerWrapper.java[0m:[90m24[0m[90m)[0m
-    ...
-[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that calls one in another object[0m  [90m0.001s[0m Function that throws error...
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that calls one in another object[0m  [90m0.001s[0m java.lang.Error: Function that throws error...
 [1m    at [0m[1mneotest.scala.Callable$.functionThatThrowsError[0m[1m([0m[1mCallable.scala[0m:[1m5[0m[1m)[0m
 [1m    at [0m[1mneotest.scala.Testable$.callFromAnotherObject[0m[1m([0m[1mTestable.scala[0m:[1m14[0m[1m)[0m
 [1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$10[0m[1m([0m[1mBasicSuite.scala[0m:[1m29[0m[1m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.$anonfun$munitValueTransform$3[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mscala.util.Try$.apply[0m[90m([0m[90mTry.scala[0m:[90m217[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform$[0m[90m([0m[90mValueTransforms.scala[0m:[90m22[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.munitValueTransform[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$2[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$$anon$3.run[0m[90m([0m[90mPlatformCompat.scala[0m:[90m69[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$.waitAtMost[0m[90m([0m[90mPlatformCompat.scala[0m:[90m67[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.waitForCompletion[0m[90m([0m[90mFunSuite.scala[0m:[90m51[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$1[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTestBody$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m347[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTestBody[0m[90m([0m[90mMUnitRunner.scala[0m:[90m343[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTest[0m[90m([0m[90mMUnitRunner.scala[0m:[90m324[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTests$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mscala.collection.Iterator$$anon$9.next[0m[90m([0m[90mIterator.scala[0m:[90m584[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.loop$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m160[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.sequenceFutures[0m[90m([0m[90mMUnitRunner.scala[0m:[90m173[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTests[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runAll$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m188[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAll[0m[90m([0m[90mMUnitRunner.scala[0m:[90m185[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAsync[0m[90m([0m[90mMUnitRunner.scala[0m:[90m130[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.run[0m[90m([0m[90mMUnitRunner.scala[0m:[90m121[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.junitinterface.JUnitRunnerWrapper.run[0m[90m([0m[90mJUnitRunnerWrapper.java[0m:[90m24[0m[90m)[0m
-    ...
-[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a helper function that throws[0m  [90m0.001s[0m Helper funnction that throws...
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a helper function that throws[0m  [90m0.001s[0m java.lang.Error: Helper funnction that throws...
 [1m    at [0m[1mneotest.basic.BasicSuite.helperFunctionThatThrows[0m[1m([0m[1mBasicSuite.scala[0m:[1m9[0m[1m)[0m
 [1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$11[0m[1m([0m[1mBasicSuite.scala[0m:[1m32[0m[1m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.$anonfun$munitValueTransform$3[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mscala.util.Try$.apply[0m[90m([0m[90mTry.scala[0m:[90m217[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform[0m[90m([0m[90mValueTransforms.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.ValueTransforms.munitValueTransform$[0m[90m([0m[90mValueTransforms.scala[0m:[90m22[0m[90m)[0m
-[90m    at [0m[90mmunit.FunSuite.munitValueTransform[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$2[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$$anon$3.run[0m[90m([0m[90mPlatformCompat.scala[0m:[90m69[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.PlatformCompat$.waitAtMost[0m[90m([0m[90mPlatformCompat.scala[0m:[90m67[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.waitForCompletion[0m[90m([0m[90mFunSuite.scala[0m:[90m51[0m[90m)[0m
-[90m    at [0m[90mmunit.BaseFunSuite.$anonfun$test$1[0m[90m([0m[90mFunSuite.scala[0m:[90m37[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.console.StackTraces$.dropOutside[0m[90m([0m[90mStackTraces.scala[0m:[90m12[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTestBody$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m347[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTestBody[0m[90m([0m[90mMUnitRunner.scala[0m:[90m343[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTest[0m[90m([0m[90mMUnitRunner.scala[0m:[90m324[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runTests$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mscala.collection.Iterator$$anon$9.next[0m[90m([0m[90mIterator.scala[0m:[90m584[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.loop$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m160[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.sequenceFutures[0m[90m([0m[90mMUnitRunner.scala[0m:[90m173[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runTests[0m[90m([0m[90mMUnitRunner.scala[0m:[90m145[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.$anonfun$runAll$1[0m[90m([0m[90mMUnitRunner.scala[0m:[90m188[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.run[0m[90m([0m[90mPromise.scala[0m:[90m470[0m[90m)[0m
-[90m    at [0m[90mmunit.Suite$$anon$1.execute[0m[90m([0m[90mSuite.scala[0m:[90m28[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$Transformation.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m429[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.submitWithValue[0m[90m([0m[90mPromise.scala[0m:[90m338[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.dispatchOrAddCallbacks[0m[90m([0m[90mPromise.scala[0m:[90m312[0m[90m)[0m
-[90m    at [0m[90mscala.concurrent.impl.Promise$DefaultPromise.flatMap[0m[90m([0m[90mPromise.scala[0m:[90m176[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAll[0m[90m([0m[90mMUnitRunner.scala[0m:[90m185[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.runAsync[0m[90m([0m[90mMUnitRunner.scala[0m:[90m130[0m[90m)[0m
-[90m    at [0m[90mmunit.MUnitRunner.run[0m[90m([0m[90mMUnitRunner.scala[0m:[90m121[0m[90m)[0m
-[90m    at [0m[90mmunit.internal.junitinterface.JUnitRunnerWrapper.run[0m[90m([0m[90mJUnitRunnerWrapper.java[0m:[90m24[0m[90m)[0m
-    ...
-Execution took 47ms
+Execution took 52ms
 7 tests, 2 passed, 5 failed
 
 The test execution was successfully closed.
 ===============================================
-Total duration: 47ms
+Total duration: 52ms
 1 failed
 
 Failed:
