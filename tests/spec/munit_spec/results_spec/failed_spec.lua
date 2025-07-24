@@ -1,7 +1,7 @@
 local failed = require("neotest-scala.munit.results.failed")
 
 describe("Failed helper functions scenarios", function()
-    it("should process results file and return statuses", function()
+    it("should remove all color codes from the trace line", function()
         -- GIVEN
         local line =
             "[90m    at [0m[90mmunit.FunSuite.assert[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m"

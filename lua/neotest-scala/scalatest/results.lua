@@ -29,6 +29,7 @@ return function(spec, result, _)
                 for k, v in ipairs(event.throwable.stackTraces) do
                     table.insert(traces, v.toString)
                     if v.className == event.suiteClassName then
+                        --- apparently, indexing starts from 0...
                         error_line = v.lineNumber - 1
                         goto continue
                     end

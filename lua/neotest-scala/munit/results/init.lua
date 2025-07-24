@@ -20,22 +20,28 @@ return function(_, result, _)
     local traces = {}
     local error_line = -1
 
+    local release_stack_trace = function()
+        if #traces > 0 then
+            local error_msg = table.concat(traces, "\n")
+            --- The error line of the last code trace is used...
+            table.insert(results[id]["errors"], { line = error_line, message = error_msg })
+            results[id]["short"] = error_msg
+            traces = {}
+        end
+    end
+
     for _, line in pairs(lines) do
         local status = nil
+
         match = vim.lpeg.match(finished.test_suite_started, line)
         if match ~= nil then
             suite_name = match.suite_name
         end
         match = vim.lpeg.match(finished.test_finished, line)
         if match ~= nil then
-            --- if id is set - we need to insert error message
-            --- collected before changing the id and resetting the traces
-            if #traces > 0 then
-                local error_msg = table.concat(traces, "\n")
-                table.insert(results[id]["errors"], { line = error_line, message = error_msg })
-                results[id]["short"] = error_msg
-                traces = {}
-            end
+            --- before changing the id and resetting the traces
+            --- we must release collected stack traces if any
+            release_stack_trace()
             if suite_name == nil then
                 error("Suite name is unknown!", vim.log.levels.ERROR)
             end
@@ -44,22 +50,28 @@ return function(_, result, _)
         end
         match = vim.lpeg.match(failed.test_failure, line)
         if match ~= nil then
-            --- if id is set - we need to insert error message
-            --- collected before changing the id and creating new traces
-            if #traces > 0 then
-                local error_msg = table.concat(traces, "\n")
-                table.insert(results[id]["errors"], { line = error_line, message = error_msg })
-                results[id]["short"] = error_msg
-            end
+            release_stack_trace()
             suite_name = match.suite_name
             test_name = match.test_name
             status = types.ResultStatus.failed
             traces = { match.error_message or "" }
         end
-        --- TODO: We need to match stack trace lines and add them to traces table...
+
+        --- Collect stack trace in case of failure
         match = vim.lpeg.match(failed.framework_trace, line)
         if match ~= nil then
             table.insert(traces, failed.cleaned_trace_line(line))
+        end
+        match = vim.lpeg.match(failed.code_trace, line)
+        if match ~= nil then
+            table.insert(traces, failed.cleaned_trace_line(line))
+            local line = math.floor(match.error_line)
+            if line then
+                --- apparently, indexing starts from 0...
+                error_line = line - 1
+            else
+                error(string.format("Can't convert %s to integer!", match.error_line))
+            end
         end
 
         ---
@@ -74,10 +86,7 @@ return function(_, result, _)
         end
     end
     --- in case the last test scenario failed
-    if #traces > 0 then
-        local error_msg = table.concat(traces, "\n")
-        table.insert(results[id]["errors"], { line = error_line, message = error_msg })
-        results[id]["short"] = error_msg
-    end
+    release_stack_trace()
+
     return results
 end

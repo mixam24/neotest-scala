@@ -17,7 +17,7 @@ local runtime_class_name =
     vim.lpeg.Cg(((code.alpha_numeric + vim.lpeg.P("$")) ^ 1 * code.dot ^ 0) ^ 1, "runtime_class_name")
 --- We may want to change it in future...
 local filename = (code.any - color.ALL) ^ 1
-local erorr_line = vim.lpeg.Cg(code.numeric ^ 1, "erorr_line")
+local erorr_line = vim.lpeg.Cg(code.numeric ^ 1, "error_line")
 
 M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * code.spaces)
     * utils.colored(color.faint, runtime_class_name)
@@ -26,6 +26,16 @@ M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * 
     * vim.lpeg.P(":")
     * utils.colored(color.faint, erorr_line)
     * utils.colored(color.faint, vim.lpeg.P(")"))
+
+M.code_trace = vim.lpeg.Ct(
+    utils.colored(color.high_intensity, code.spaces * vim.lpeg.P("at") * code.spaces)
+        * utils.colored(color.high_intensity, runtime_class_name)
+        * utils.colored(color.high_intensity, vim.lpeg.P("("))
+        * utils.colored(color.high_intensity, filename)
+        * vim.lpeg.P(":")
+        * utils.colored(color.high_intensity, erorr_line)
+        * utils.colored(color.high_intensity, vim.lpeg.P(")"))
+)
 
 ---Removes color codes from the given stack trace string
 ---@param line string Colored stack trace line of text

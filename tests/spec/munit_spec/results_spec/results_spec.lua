@@ -34,6 +34,7 @@ describe("Basic scenarios", function()
             end
             assert.array(tests).has.no.holes(7)
             assert.same(results["neotest.basic.BasicSuite::This one will always fail"].status, "failed")
+            --- TODO: check the line where test failed...
         end)
     )
 end)
