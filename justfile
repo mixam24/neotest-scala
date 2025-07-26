@@ -34,3 +34,19 @@ run-munit-project-tests runner='bloop':
       sbt -java-home "{{java-home}}" bloopInstall
       bloop test -p scala2 &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
     fi
+
+run-utest-project-tests runner='bloop':
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    PROJECT_DIR="{{ justfile_directory() }}/tests/data/utest/projects/scala2"
+    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/utest/results/scala2.log"
+
+    cd "${PROJECT_DIR}"
+    if [ "{{runner}}" == "sbt" ]
+    then
+      sbt -java-home "{{java-home}}" test &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
+    else
+      sbt -java-home "{{java-home}}" bloopInstall
+      bloop test -p scala2 &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
+    fi

@@ -78,8 +78,10 @@ setmetatable(Adapter, {
             impl = require("neotest-scala.scalatest")
         elseif opts.framework == "munit" then
             impl = require("neotest-scala.munit")
+        elseif opts.framework == "utest" then
+            impl = require("neotest-scala.utest")
         else
-            error("Not implemented yet!", vim.log.levels.ERROR)
+            error("Not implemented!", vim.log.levels.ERROR)
         end
         return vim.tbl_deep_extend("force", Adapter, impl({ runner = opts.runner }))
     end,
