@@ -20,9 +20,13 @@ return function(_, result, tree)
     local test_id_mapping = {}
     for _, node in tree:iter_nodes() do
         local info = node:data()
+        if info.type ~= "test" then
+            goto continue
+        end
         local split_position = string.find(info.id, "::")
         local key = string.sub(info.id, 1, split_position - 1) .. "." .. string.sub(info.id, split_position + 2)
         test_id_mapping[key] = info.id
+        ::continue::
     end
 
     for _, line in pairs(lines) do

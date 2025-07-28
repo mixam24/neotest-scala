@@ -24,25 +24,34 @@ describe("Basic scenarios", function()
                 { output = file_path, code = 0 },
                 types.Tree.from_list({
                     {
-                        id = "neotest.scala.basic.HelloTests::test1",
-                        name = "test1",
+                        id = "neotest.scala.basic.HelloTests",
+                        name = "HelloTests",
                         path = "path/to/the/HelloTests.scala",
                         range = { 12, 6, 16, 7 },
-                        type = "test",
+                        type = "namespace",
                     },
                     {
-                        id = "neotest.scala.basic.HelloTests::test2",
-                        name = "test1",
-                        path = "path/to/the/HelloTests.scala",
-                        range = { 12, 6, 16, 7 },
-                        type = "test",
-                    },
-                    {
-                        id = "neotest.scala.basic.HelloTests::test3",
-                        name = "test1",
-                        path = "path/to/the/HelloTests.scala",
-                        range = { 12, 6, 16, 7 },
-                        type = "test",
+                        {
+                            id = "neotest.scala.basic.HelloTests::test1",
+                            name = "test1",
+                            path = "path/to/the/HelloTests.scala",
+                            range = { 12, 6, 16, 7 },
+                            type = "test",
+                        },
+                        {
+                            id = "neotest.scala.basic.HelloTests::test2",
+                            name = "test1",
+                            path = "path/to/the/HelloTests.scala",
+                            range = { 12, 6, 16, 7 },
+                            type = "test",
+                        },
+                        {
+                            id = "neotest.scala.basic.HelloTests::test3",
+                            name = "test1",
+                            path = "path/to/the/HelloTests.scala",
+                            range = { 12, 6, 16, 7 },
+                            type = "test",
+                        },
                     },
                 }, function(_)
                     return "neotest.scala.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException"
