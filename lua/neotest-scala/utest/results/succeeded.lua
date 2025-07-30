@@ -1,5 +1,4 @@
 local const = require("neotest-scala.utest.results.constants")
-local utils = require("neotest-scala.utest.results.utils")
 local color = const.color
 local fragment = const.fragment
 local code = const.code
@@ -19,7 +18,10 @@ M.test_success = vim.lpeg.Ct(
         --- 1. https://www.gammon.com.au/lpeg
         --- 2. https://github.com/com-lihaoyi/utest/blob/712b57602aa5192e504fa05cd3fdf0a28251978a/utest/src/utest/framework/Formatter.scala#L165
         * fragment.absolute_test_name
-        * utils.colored(color.faint, fragment.duration)
+        * color.faint
+        * fragment.duration
+        * color.normal
+        * (code.spaces * color.blue * code.numeric * color.reset) ^ 0
 )
 
 return M

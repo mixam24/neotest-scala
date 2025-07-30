@@ -3,6 +3,8 @@ local M = {}
 M.color = {}
 M.color.green = vim.lpeg.P("\x1B[32m")
 M.color.red = vim.lpeg.P("\x1B[31m")
+M.color.blue = vim.lpeg.P("\x1B[34m")
+M.color.light_red = vim.lpeg.P("\x1B[91m")
 M.color.reset = vim.lpeg.P("\x1B[39m")
 M.color.normal = vim.lpeg.P("\x1B[0m")
 M.color.faint = vim.lpeg.P("\x1B[2m")
@@ -18,6 +20,22 @@ end
 
 ---@type vim.lpeg.Pattern
 M.color.ALL = COLORS
+
+M.modifier = {}
+M.modifier.underlined_text_on = vim.lpeg.P("\x1B[4m")
+M.modifier.underlined_text_off = vim.lpeg.P("\x1B[24m")
+
+local MODIFIERS = nil
+for _, value in pairs(M.modifier) do
+    if MODIFIERS == nil then
+        MODIFIERS = value
+    else
+        MODIFIERS = MODIFIERS + value
+    end
+end
+
+---@type vim.lpeg.Pattern
+M.modifier.ALL = MODIFIERS
 
 --- ALPHA-NUMERIC CODES
 M.code = {}

@@ -65,7 +65,7 @@ describe("Basic scenarios", function()
             end
             assert.array(tests).has.no.holes(3)
             assert.same(results["neotest.scala.basic.HelloTests::test1"].status, "failed")
-            --- TODO: check the line where test failed...
+            assert.same(results["neotest.scala.basic.HelloTests::test1"].errors[1].line, 7)
         end)
     )
 end)

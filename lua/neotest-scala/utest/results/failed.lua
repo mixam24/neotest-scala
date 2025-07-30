@@ -1,6 +1,6 @@
 local const = require("neotest-scala.utest.results.constants")
-local utils = require("neotest-scala.utest.results.utils")
 local color = const.color
+local modifier = const.modifier
 local fragment = const.fragment
 local code = const.code
 
@@ -10,28 +10,45 @@ local M = {}
 
 --- Stack traces
 local error_message = vim.lpeg.Cg((code.any - color.ALL) ^ 0, "error_message")
-local runtime_class_name =
-    vim.lpeg.Cg(((code.alpha_numeric + vim.lpeg.P("$")) ^ 1 * code.dot ^ 0) ^ 1, "runtime_class_name")
+local class_name = (code.alpha_numeric ^ 1 * code.dot ^ 0) ^ 1
+local runtime_class_name = ((code.alpha_numeric + vim.lpeg.P("$")) ^ 1 * code.dot ^ 0) ^ 1
+--- We may want to change it in future...
+local runtime_method_name = runtime_class_name
 --- We may want to change it in future...
 local filename = (code.any - color.ALL) ^ 1
 local erorr_line = vim.lpeg.Cg(code.numeric ^ 1, "error_line")
 
-M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * code.spaces)
-    * utils.colored(color.faint, runtime_class_name)
-    * utils.colored(color.faint, vim.lpeg.P("("))
-    * utils.colored(color.faint, filename)
-    * vim.lpeg.P(":")
-    * utils.colored(color.faint, erorr_line)
-    * utils.colored(color.faint, vim.lpeg.P(")"))
+M.exception_trace = vim.lpeg.Ct(
+    code.spaces
+        * color.light_red
+        * modifier.underlined_text_on
+        * class_name
+        * color.reset
+        * modifier.underlined_text_off
+        * vim.lpeg.P(":")
+        * code.spaces
+        * color.light_red
+        * error_message
+        * color.reset
+)
 
 M.code_trace = vim.lpeg.Ct(
-    utils.colored(color.normal, code.spaces * vim.lpeg.P("at") * code.spaces)
-        * utils.colored(color.normal, runtime_class_name)
-        * utils.colored(color.normal, vim.lpeg.P("("))
-        * utils.colored(color.normal, filename)
+    code.spaces
+        * color.red
+        * runtime_class_name
+        * color.light_red
+        * runtime_method_name
+        * color.red
+        * vim.lpeg.P("(")
+        * color.light_red
+        * filename
+        * color.reset
         * vim.lpeg.P(":")
-        * utils.colored(color.normal, erorr_line)
-        * utils.colored(color.normal, vim.lpeg.P(")"))
+        * color.light_red
+        * erorr_line
+        * color.red
+        * vim.lpeg.P(")")
+        * color.reset
 )
 
 ---Removes color codes from the given stack trace string
@@ -39,7 +56,7 @@ M.code_trace = vim.lpeg.Ct(
 ---@return string
 M.cleaned_trace_line = function(line)
     --- Any matched color code passed to the function...
-    local pattern = vim.lpeg.Cs((color.ALL / function(_)
+    local pattern = vim.lpeg.Cs(((color.ALL + modifier.ALL) / function(_)
         return ""
     end + 1) ^ 0)
     return vim.lpeg.match(pattern, line)
@@ -56,7 +73,9 @@ M.test_failure = vim.lpeg.Ct(
         --- 1. https://www.gammon.com.au/lpeg
         --- 2. https://github.com/com-lihaoyi/utest/blob/712b57602aa5192e504fa05cd3fdf0a28251978a/utest/src/utest/framework/Formatter.scala#L165
         * fragment.absolute_test_name
-        * utils.colored(color.faint, fragment.duration)
+        * color.faint
+        * fragment.duration
+        * color.normal
 )
 
 return M
