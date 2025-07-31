@@ -68,4 +68,44 @@ describe("Basic scenarios", function()
             assert.same(results["neotest.scala.basic.HelloTests::test1"].errors[1].line, 7)
         end)
     )
+    it(
+        "should process results file and return statuses when output contains more scenarios than expected",
+        async(function()
+            -- GIVEN
+            local file_path = vim.env.TEST_DATA_DIR .. "/utest/results/scala2.log"
+
+            -- WHEN
+            local results = scala.results(
+                {
+                    command = {},
+                    stream = function(_)
+                        ---@diagnostic disable-next-line: return-type-mismatch
+                        return {}
+                    end,
+                    context = {},
+                },
+                { output = file_path, code = 0 },
+                types.Tree.from_list({
+                    {
+                        id = "neotest.scala.basic.HelloTests::test1",
+                        name = "test1",
+                        path = "path/to/the/HelloTests.scala",
+                        range = { 12, 6, 16, 7 },
+                        type = "test",
+                    },
+                }, function(_)
+                    return "neotest.scala.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException"
+                end)
+            )
+
+            -- THEN
+            local tests = {}
+            for key, _ in pairs(results) do
+                table.insert(tests, key)
+            end
+            assert.array(tests).has.no.holes(1)
+            assert.same(results["neotest.scala.basic.HelloTests::test1"].status, "failed")
+            assert.same(results["neotest.scala.basic.HelloTests::test1"].errors[1].line, 7)
+        end)
+    )
 end)

@@ -2,6 +2,7 @@ local const = require("neotest-scala.utest.results.constants")
 local color = const.color
 local fragment = const.fragment
 local code = const.code
+local modifier = const.modifier
 
 local M = {}
 
@@ -10,7 +11,8 @@ local M = {}
 --- See for details: https://github.com/com-lihaoyi/utest/blob/cc0228fb26262e36584fd97a0c39fd64b7d652f6/utest/src/utest/framework/Formatter.scala#L180
 
 M.test_success = vim.lpeg.Ct(
-    color.green
+    modifier.sbt_wrapper_code ^ 0
+        * color.green
         * vim.lpeg.P("+")
         * color.reset
         * code.spaces
@@ -22,6 +24,7 @@ M.test_success = vim.lpeg.Ct(
         * fragment.duration
         * color.normal
         * (code.spaces * color.blue * code.numeric * color.reset) ^ 0
+        * (code.spaces * modifier.sbt_wrapper_code) ^ 0
 )
 
 return M

@@ -26,7 +26,7 @@ local function absolute_test_name(package_mapping, position, parents)
     if head.type == "namespace" then
         return string.format("%s::%s", head.id, position.name)
     else
-        return string.format("%s %s", head.id, position.name)
+        return string.format("%s.%s", head.id, position.name)
     end
 end
 

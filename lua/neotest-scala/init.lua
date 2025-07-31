@@ -73,6 +73,10 @@ setmetatable(Adapter, {
             utils.index({ "bloop", "sbt" }, opts.runner),
             "'runner' value provided is not supported. Supported values: 'sbt', 'bloop'"
         )
+        assert(
+            not (opts.java_home ~= nil and opts.framework == "sbt" and opts.framework == "utest"),
+            "'java_home' can be specified only when 'framework' is 'utest' and 'runner' is 'sbt'"
+        )
         local impl = {}
         if opts.framework == "scalatest" then
             impl = require("neotest-scala.scalatest")
@@ -83,7 +87,7 @@ setmetatable(Adapter, {
         else
             error("Not implemented!", vim.log.levels.ERROR)
         end
-        return vim.tbl_deep_extend("force", Adapter, impl({ runner = opts.runner }))
+        return vim.tbl_deep_extend("force", Adapter, impl(opts))
     end,
 })
 

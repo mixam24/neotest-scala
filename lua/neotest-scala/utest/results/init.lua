@@ -52,6 +52,11 @@ return function(_, result, tree)
             release_stack_trace()
             local absolute_test_name = string.sub(match.absolute_test_name, 1, #match.absolute_test_name - 1)
             id = test_id_mapping[absolute_test_name]
+            if id == nil then
+                --- it can be so that log contains more tests than user asked to run
+                --- e.g. if sbt version is old and buggy...
+                goto continue
+            end
             status = types.ResultStatus.failed
             results[id] = { status = status, errors = {} }
         end
@@ -62,15 +67,30 @@ return function(_, result, tree)
             release_stack_trace()
             local absolute_test_name = string.sub(match.absolute_test_name, 1, #match.absolute_test_name - 1)
             id = test_id_mapping[absolute_test_name]
+            if id == nil then
+                --- it can be so that log contains more tests than user asked to run
+                --- e.g. if sbt version is old and buggy...
+                goto continue
+            end
             status = types.ResultStatus.passed
             results[id] = { status = status, errors = {} }
         end
         match = vim.lpeg.match(failed.exception_trace, line)
         if match ~= nil then
+            if id == nil then
+                --- it can be so that log contains more tests than user asked to run
+                --- e.g. if sbt version is old and buggy...
+                goto continue
+            end
             table.insert(traces, failed.cleaned_trace_line(line))
         end
         match = vim.lpeg.match(failed.code_trace, line)
         if match ~= nil then
+            if id == nil then
+                --- it can be so that log contains more tests than user asked to run
+                --- e.g. if sbt version is old and buggy...
+                goto continue
+            end
             table.insert(traces, failed.cleaned_trace_line(line))
             local line = math.floor(match.error_line)
             if line then
@@ -80,6 +100,7 @@ return function(_, result, tree)
                 error(string.format("Can't convert %s to integer!", match.error_line))
             end
         end
+        ::continue::
     end
     --- in case the last test scenario failed
     release_stack_trace()

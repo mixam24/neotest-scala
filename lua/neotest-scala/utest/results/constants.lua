@@ -24,6 +24,7 @@ M.color.ALL = COLORS
 M.modifier = {}
 M.modifier.underlined_text_on = vim.lpeg.P("\x1B[4m")
 M.modifier.underlined_text_off = vim.lpeg.P("\x1B[24m")
+M.modifier.sbt_wrapper_code = vim.lpeg.P("\x1B[0J")
 
 local MODIFIERS = nil
 for _, value in pairs(M.modifier) do

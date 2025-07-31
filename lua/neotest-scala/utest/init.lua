@@ -7,6 +7,7 @@ local M = {}
 
 ---@class FrameworkArgs
 ---@field runner string Name of the runner to use
+---@field java_home string|nil Java home to use for sbt
 
 setmetatable(M, {
     ---comment
@@ -18,9 +19,13 @@ setmetatable(M, {
             utils.index({ "bloop", "sbt" }, opts.runner),
             "'runner' value provided is not supported with 'munit' framework. Supported values: 'sbt', 'bloop'"
         )
+        assert(
+            not (opts.java_home ~= nil and opts.runner == "bloop"),
+            "'java_home' parameter can only be configured for 'sbt' runner"
+        )
         M.results = results
         M.build_spec = function(args)
-            return build_spec(opts.runner, args)
+            return build_spec(opts, args)
         end
         M.discover_positions = discover_positions
         return M

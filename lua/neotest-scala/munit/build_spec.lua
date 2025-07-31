@@ -1,4 +1,3 @@
-local utils = require("neotest-scala.utils")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
 

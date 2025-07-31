@@ -65,7 +65,8 @@ end
 --- See for details: https://github.com/com-lihaoyi/utest/blob/cc0228fb26262e36584fd97a0c39fd64b7d652f6/utest/src/utest/framework/Formatter.scala#L180
 
 M.test_failure = vim.lpeg.Ct(
-    color.red
+    modifier.sbt_wrapper_code ^ 0
+        * color.red
         * vim.lpeg.P("X")
         * color.reset
         * code.spaces
@@ -76,6 +77,7 @@ M.test_failure = vim.lpeg.Ct(
         * color.faint
         * fragment.duration
         * color.normal
+        * (code.spaces * modifier.sbt_wrapper_code) ^ 0
 )
 
 return M

@@ -1,65 +1,83 @@
-local utils = require("neotest-scala.utils")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
+local logger = require("neotest.logging")
 
--- Builds a test path from the current position in the tree.
----@param tree neotest.Tree
----@param name string
----@return string|nil
-local function build_test_path(tree, name)
-    local parent_tree = tree:parent()
-    local type = tree:data().type
-    if parent_tree and parent_tree:data().type == "namespace" then
-        local package = utils.get_package_name(parent_tree:data().path)
-        local parent_name = parent_tree:data().name
-        return package .. parent_name .. "." .. name
+---@class TestArguments
+---@field name string|nil
+---@field class string|nil
+---@field pkg string|nil
+
+---@param tree neotest.Tree Neotest tree to traverse
+---@return TestArguments
+local function test_arguments(tree)
+    local node = tree:data()
+    if node.type == "test" then
+        local split_position = string.find(node.id, "::")
+        return { class = string.sub(node.id, 1, split_position - 1), name = string.sub(node.id, split_position + 2) }
+    elseif node.type == "namespace" then
+        return { class = node.id }
+    else
+        -- It should never happen...
+        error("Should never happen...", vim.log.levels.ERROR)
     end
-    if parent_tree and parent_tree:data().type == "test" then
-        local parent_pos = parent_tree:data()
-        return build_test_path(parent_tree, utils.get_position_name(parent_pos)) .. "." .. name
-    end
-    if type == "namespace" then
-        local package = utils.get_package_name(tree:data().path)
-        if not package then
-            return nil
-        end
-        return package .. name
-    end
-    if type == "file" then
-        local test_suites = {}
-        for _, child in tree:iter_nodes() do
-            if child:data().type == "namespace" then
-                table.insert(test_suites, child:data().name)
-            end
-        end
-        if test_suites then
-            local package = utils.get_package_name(tree:data().path)
-            return package .. "{" .. table.concat(test_suites, ",") .. "}"
-        end
-    end
-    if type == "dir" then
-        local packages = {}
-        local visited = {}
-        for _, child in tree:iter_nodes() do
-            if child:data().type == "namespace" then
-                local package = utils.get_package_name(child:data().path)
-                if package and not visited[package] then
-                    table.insert(packages, package:sub(1, -2))
-                    visited[package] = true
-                end
-            end
-        end
-        if packages then
-            return "{" .. table.concat(packages, ",") .. "}"
-        end
-    end
-    return nil
 end
 
----@param runner string Name of the runner
+--- Builds a command for running tests for the framework.
+---@param fargs FrameworkArgs
+---@param project string
+---@param tree neotest.Tree
+---@return string[]
+local function build_command(fargs, project, tree)
+    local runner_args
+    local test_command_args = {}
+    local framework_args = { "--" }
+
+    if fargs.runner == "bloop" then
+        runner_args = { "bloop", "test", project }
+    elseif fargs.runner == "sbt" then
+        runner_args = {
+            "sbt",
+            "-Dsbt.supershell=false",
+        }
+        if fargs.java_home ~= nil then
+            runner_args = vim.tbl_flatten({ runner_args, "--java-home", fargs.java_home })
+        end
+        runner_args = vim.tbl_flatten({ runner_args, project .. "/testOnly" })
+    else
+        error("Should never happen...", vim.log.levels.ERROR)
+    end
+
+    local arguments = test_arguments(tree)
+    --- TODO: should we remove pkg from the TestArguments?
+    ---  It is not in use...
+    if arguments.pkg then
+        if fargs.runner == "sbt" then
+            test_command_args = { arguments.pkg }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, arguments.pkg })
+        end
+    elseif arguments.name then
+        if fargs.runner == "sbt" then
+            framework_args =
+                vim.tbl_flatten({ framework_args, string.format('"%s.%s"', arguments.class, arguments.name) })
+        else
+            framework_args =
+                vim.tbl_flatten({ framework_args, string.format("%s.%s", arguments.class, arguments.name) })
+        end
+    else
+        if fargs.runner == "sbt" then
+            test_command_args = { arguments.class }
+        else
+            framework_args = vim.tbl_flatten({ framework_args, arguments.class })
+        end
+    end
+    return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
+end
+
+---@param fargs FrameworkArgs Framework argusments
 ---@param args neotest.RunArgs
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
-return function(runner, args)
+return function(fargs, args)
     local position = args.tree:data()
     if lib.func_util.index({ "dir", "file" }, position.type) then
         -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
@@ -69,11 +87,14 @@ return function(runner, args)
         --  structure names.
         return nil
     end
-    assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
-    local project = common.get_project_name(position.path, runner)
+    assert(lib.func_util.index({ "bloop", "sbt" }, fargs.runner), "set sbt or bloop runner")
+    local project = common.get_project_name(position.path, fargs.runner)
     assert(project, "scala project not found in the build file")
-    local test_path = build_test_path(args.tree, utils.get_position_name(position))
-    local command = utils.build_command_with_test_path(project, runner, test_path, {})
+    local command = build_command(fargs, project, args.tree)
     local strategy = common.get_strategy_config(args.strategy, args.tree, project)
-    return { command = command, strategy = strategy }
+    return {
+        command = command,
+        strategy = strategy,
+        context = {},
+    }
 end
