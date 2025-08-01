@@ -23,29 +23,14 @@ local function test_arguments(tree)
 end
 
 --- Builds a command for running tests for the framework.
----@param fargs FrameworkArgs
+---@param fargs neotest-scala.FrameworkArgs
 ---@param project string
 ---@param tree neotest.Tree
 ---@return string[]
 local function build_command(fargs, project, tree)
-    local runner_args
+    local runner_args = common.get_runner_arguments(fargs, project)
     local test_command_args = {}
     local framework_args = { "--" }
-
-    if fargs.runner == "bloop" then
-        runner_args = { "bloop", "test", project }
-    elseif fargs.runner == "sbt" then
-        runner_args = {
-            "sbt",
-            "-Dsbt.supershell=false",
-        }
-        if fargs.java_home ~= nil then
-            runner_args = vim.tbl_flatten({ runner_args, "--java-home", fargs.java_home })
-        end
-        runner_args = vim.tbl_flatten({ runner_args, project .. "/testOnly" })
-    else
-        error("Should never happen...", vim.log.levels.ERROR)
-    end
 
     local arguments = test_arguments(tree)
     --- TODO: should we remove pkg from the TestArguments?
@@ -74,7 +59,7 @@ local function build_command(fargs, project, tree)
     return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
 end
 
----@param fargs FrameworkArgs Framework argusments
+---@param fargs neotest-scala.FrameworkArgs Framework argusments
 ---@param args neotest.RunArgs
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
 return function(fargs, args)

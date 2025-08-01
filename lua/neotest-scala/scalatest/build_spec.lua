@@ -23,40 +23,32 @@ local function test_arguments(tree)
 end
 
 --- Builds a command for running tests for the framework.
----@param runner string
+---@param fargs neotest-scala.FrameworkArgs Framework arguments
 ---@param project string
 ---@param tree neotest.Tree
 ---@param path string Path to the temp file for results output
 ---@return string[]
-local function build_command(runner, project, tree, path)
-    local runner_args
+local function build_command(fargs, project, tree, path)
+    local runner_args = common.get_runner_arguments(fargs, project)
     local test_command_args = {}
     local framework_args = { "--", "-fJ", path }
 
-    if runner == "bloop" then
-        runner_args = { "bloop", "test", "--no-color", project }
-    elseif runner == "sbt" then
-        runner_args = { "sbt", "--no-colors", project .. "/testOnly" }
-    else
-        error("Should never happen...", vim.log.levels.ERROR)
-    end
-
     local arguments = test_arguments(tree)
     if arguments.pkg then
-        if runner == "sbt" then
+        if fargs.runner == "sbt" then
             test_command_args = { arguments.pkg }
         else
             framework_args = vim.tbl_flatten({ framework_args, "-m", arguments.pkg })
         end
     elseif arguments.name then
-        if runner == "sbt" then
+        if fargs.runner == "sbt" then
             test_command_args = { arguments.class }
         else
             framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
         end
         framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
     else
-        if runner == "sbt" then
+        if fargs.runner == "sbt" then
             test_command_args = { arguments.class }
         else
             framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
@@ -65,10 +57,10 @@ local function build_command(runner, project, tree, path)
     return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
 end
 
----@param runner string Name of the runner
+---@param fargs neotest-scala.FrameworkArgs Framework arguments
 ---@param args neotest.RunArgs
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
-return function(runner, args)
+return function(fargs, args)
     local position = args.tree:data()
     if lib.func_util.index({ "dir", "file" }, position.type) then
         -- NOTE:Although IT’S NOT REQUIRED, package names typically follow directory structure names.
@@ -78,11 +70,11 @@ return function(runner, args)
         --  structure names.
         return nil
     end
-    assert(lib.func_util.index({ "bloop", "sbt" }, runner), "set sbt or bloop runner")
-    local project = common.get_project_name(position.path, runner)
+    assert(lib.func_util.index({ "bloop", "sbt" }, fargs.runner), "set sbt or bloop runner")
+    local project = common.get_project_name(position.path, fargs.runner)
     assert(project, "scala project not found in the build file")
     local results_path = nio.fn.tempname()
-    local command = build_command(runner, project, args.tree, results_path)
+    local command = build_command(fargs, project, args.tree, results_path)
     local strategy = common.get_strategy_config(args.strategy, args.tree, project)
     return {
         command = command,

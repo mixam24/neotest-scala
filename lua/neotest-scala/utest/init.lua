@@ -5,13 +5,9 @@ local utils = require("neotest.lib.func_util")
 
 local M = {}
 
----@class FrameworkArgs
----@field runner string Name of the runner to use
----@field java_home string|nil Java home to use for sbt
-
 setmetatable(M, {
     ---comment
-    ---@param opts FrameworkArgs
+    ---@param opts neotest-scala.FrameworkArgs
     ---@return table
     __call = function(_, opts)
         assert(opts.runner, "'runner' value is not defined in the adapter config!")
@@ -20,7 +16,7 @@ setmetatable(M, {
             "'runner' value provided is not supported with 'munit' framework. Supported values: 'sbt', 'bloop'"
         )
         assert(
-            not (opts.java_home ~= nil and opts.runner == "bloop"),
+            not (opts.java_home ~= nil and opts.runner ~= "sbt"),
             "'java_home' parameter can only be configured for 'sbt' runner"
         )
         M.results = results

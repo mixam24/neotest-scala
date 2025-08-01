@@ -74,8 +74,8 @@ setmetatable(Adapter, {
             "'runner' value provided is not supported. Supported values: 'sbt', 'bloop'"
         )
         assert(
-            not (opts.java_home ~= nil and opts.framework == "sbt" and opts.framework == "utest"),
-            "'java_home' can be specified only when 'framework' is 'utest' and 'runner' is 'sbt'"
+            not (opts.java_home ~= nil and opts.runner ~= "sbt"),
+            "'java_home' parameter can only be configured for 'sbt' runner"
         )
         local impl = {}
         if opts.framework == "scalatest" then

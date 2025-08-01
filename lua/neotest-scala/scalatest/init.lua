@@ -5,12 +5,9 @@ local utils = require("neotest.lib.func_util")
 
 local M = {}
 
----@class FrameworkArgs
----@field runner string Name of the runner to use
-
 setmetatable(M, {
     ---comment
-    ---@param opts FrameworkArgs
+    ---@param opts neotest-scala.FrameworkArgs
     ---@return table
     __call = function(_, opts)
         assert(opts.runner, "'runner' value is not defined in the adapter config!")
@@ -20,7 +17,7 @@ setmetatable(M, {
         )
         M.results = results
         M.build_spec = function(args)
-            return build_spec(opts.runner, args)
+            return build_spec(opts, args)
         end
         M.discover_positions = discover_positions
         return M

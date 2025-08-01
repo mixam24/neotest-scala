@@ -109,7 +109,6 @@ describe("Bloop scenarios", function()
             assert.are_same({
                 "bloop",
                 "test",
-                "--no-color",
                 "project",
                 "--",
                 "-fJ",
@@ -152,7 +151,6 @@ describe("Bloop scenarios", function()
             assert.are_same({
                 "bloop",
                 "test",
-                "--no-color",
                 "project",
                 "--",
                 "-fJ",
@@ -250,7 +248,7 @@ describe("Sbt scenarios", function()
             assert.are(result, "Result is nil")
             assert.are_same({
                 "sbt",
-                "--no-colors",
+                "-Dsbt.supershell=false",
                 "project" .. "/testOnly",
                 "neotest.scala.basic.WordSpec",
                 "--",
@@ -291,7 +289,7 @@ describe("Sbt scenarios", function()
             assert.are(result, "Result is nil")
             assert.are_same({
                 "sbt",
-                "--no-colors",
+                "-Dsbt.supershell=false",
                 "project" .. "/testOnly",
                 "neotest.scala.basic.WordSpec",
                 "--",

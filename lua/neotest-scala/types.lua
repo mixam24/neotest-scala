@@ -2,3 +2,7 @@
 ---@field build_command fun(runner: string, project: string, tree: neotest.Tree, name: string, extra_args: table|string): string[]
 ---@field get_test_results fun(output_lines: string[]): table<string, neotest.Result>
 ---@field match_func nil|fun(test_results: table<string, string>, position_id :string):string|nil
+
+---@class neotest-scala.FrameworkArgs
+---@field runner string Name of the runner to use
+---@field java_home string|nil Java home to use for sbt

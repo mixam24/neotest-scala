@@ -111,4 +111,26 @@ function M.get_strategy_config(strategy, tree, project)
     return nil
 end
 
+---Returns runner arguments from the given framework arguments
+---@param frags FrameworkArgs Framework arguments
+---@param project string Project name in which tests are defined
+function M.get_runner_arguments(fargs, project)
+    local args
+    if fargs.runner == "bloop" then
+        args = { "bloop", "test", project }
+    elseif fargs.runner == "sbt" then
+        args = {
+            "sbt",
+            "-Dsbt.supershell=false",
+        }
+        if fargs.java_home ~= nil then
+            args = vim.tbl_flatten({ args, "--java-home", fargs.java_home })
+        end
+        args = vim.tbl_flatten({ args, project .. "/testOnly" })
+    else
+        error("Should never happen...", vim.log.levels.ERROR)
+    end
+    return args
+end
+
 return M
