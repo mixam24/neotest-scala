@@ -105,7 +105,7 @@ describe("Bloop scenarios", function()
                 "bloop",
                 "test",
                 "project",
-                "--",
+                "--args",
                 "neotest.scala.basic.BasicSuite.*",
             }, result.command, "Not what expected as command")
             assert.are_same({}, result.context, "Not what expected as context")
@@ -140,7 +140,7 @@ describe("Bloop scenarios", function()
                 "bloop",
                 "test",
                 "project",
-                "--",
+                "--args",
                 "neotest.scala.basic.BasicSuite.Invoking head on an empty Set should produce NoSuchElementException",
             }, result.command, "Not what expected as command")
             assert.are_same({}, result.context, "Not what expected as context")
@@ -203,13 +203,69 @@ describe("Sbt scenarios", function()
     it(
         "Emit command when root point to a test suite",
         async(function()
-            --- TODO: add test
+            -- GIVEN
+            local tree = types.Tree.from_list({
+                {
+                    id = "neotest.scala.basic.BasicSuite",
+                    name = "BasicSuite",
+                    path = "path/to/the/BasicSuite.scala",
+                    range = { 4, 0, 22, 1 },
+                    type = "namespace",
+                },
+            }, function(_)
+                return "neotest.scala.basic.BasicSuite"
+            end)
+
+            -- WHEN
+            local result = sbt.build_spec({
+                tree = tree,
+                extra_args = {},
+                strategy = "integrated",
+            })
+
+            -- THEN
+            assert.are(result, "Result is nil")
+            assert.are_same({
+                "sbt",
+                "-Dsbt.supershell=false",
+                "project project",
+                "testOnly -- neotest.scala.basic.BasicSuite.*",
+            }, result.command, "Not what expected as command")
+            assert.are_same({}, result.context, "Not what expected as context")
         end)
     )
     it(
         "Emit command when root points to a test scenario",
         async(function()
-            --- TODO: add test
+            -- GIVEN
+            local tree = types.Tree.from_list({
+                {
+                    id = "neotest.scala.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException",
+                    name = "Invoking head on an empty Set should produce NoSuchElementException",
+                    path = "path/to/the/BasicSuite.scala",
+                    range = { 12, 6, 16, 7 },
+                    type = "test",
+                },
+            }, function(_)
+                return "neotest.scala.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException"
+            end)
+
+            -- WHEN
+            local result = sbt.build_spec({
+                tree = tree,
+                extra_args = {},
+                strategy = "integrated",
+            })
+
+            -- THEN
+            assert.are(result, "Result is nil")
+            assert.are_same({
+                "sbt",
+                "-Dsbt.supershell=false",
+                "project project",
+                'testOnly -- "neotest.scala.basic.BasicSuite.Invoking head on an empty Set should produce NoSuchElementException"',
+            }, result.command, "Not what expected as command")
+            assert.are_same({}, result.context, "Not what expected as context")
         end)
     )
 end)

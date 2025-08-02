@@ -36,20 +36,20 @@ local function build_command(fargs, project, tree)
     ---  It is not in use...
     if arguments.pkg then
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.pkg }
+            framework_args = { arguments.pkg }
         else
             framework_args = vim.tbl_flatten({ framework_args, string.format("%s.*", arguments.pkg) })
         end
     elseif arguments.name then
         if fargs.runner == "sbt" then
-            test_command_args = { string.format('"%s.%s"', arguments.class, arguments.name) }
+            framework_args = { string.format('"%s.%s"', arguments.class, arguments.name) }
         else
             framework_args =
                 vim.tbl_flatten({ framework_args, string.format("%s.%s", arguments.class, arguments.name) })
         end
     else
         if fargs.runner == "sbt" then
-            test_command_args = { string.format("%s.*", arguments.class) }
+            framework_args = { string.format("%s.*", arguments.class) }
         else
             framework_args = vim.tbl_flatten({ framework_args, string.format("%s.*", arguments.class) })
         end

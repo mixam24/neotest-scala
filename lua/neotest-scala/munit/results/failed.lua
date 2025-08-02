@@ -13,7 +13,7 @@ local failed_test_name = utils.colored(color.light_red, fragment.test_name)
 local failed_test_abs_name = failed_test_suite_name * (vim.lpeg.P(".") * failed_test_name) ^ 0
 
 --- Stack traces
-local error_message = vim.lpeg.Cg((code.any - color.ALL) ^ 0, "error_message")
+local error_message = vim.lpeg.Cg((code.any - color.ALL - modifier.ALL) ^ 0, "error_message")
 local runtime_class_name =
     vim.lpeg.Cg(((code.alpha_numeric + vim.lpeg.P("$")) ^ 1 * code.dot ^ 0) ^ 1, "runtime_class_name")
 --- We may want to change it in future...

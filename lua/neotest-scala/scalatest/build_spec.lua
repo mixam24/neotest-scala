@@ -38,20 +38,21 @@ local function build_command(fargs, project, tree, path)
         if fargs.runner == "sbt" then
             test_command_args = vim.tbl_flatten({ test_command_args, arguments.pkg })
         else
-            framework_args = vim.tbl_flatten({ framework_args, "-m", arguments.pkg })
+            framework_args = vim.tbl_flatten({ framework_args, "-o", arguments.pkg })
         end
     elseif arguments.name then
         if fargs.runner == "sbt" then
             test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
+            framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
         else
-            framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
+            test_command_args = vim.tbl_flatten({ test_command_args, "-o", arguments.class })
+            framework_args = vim.tbl_flatten({ framework_args, "-z", arguments.name })
         end
-        framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
     else
         if fargs.runner == "sbt" then
             test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
         else
-            framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
+            test_command_args = vim.tbl_flatten({ test_command_args, "-o", arguments.class })
         end
     end
     return common.combine_command_arguments(

@@ -37,7 +37,7 @@ local function build_command(fargs, project, tree)
     ---  It is not in use...
     if arguments.pkg then
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.pkg }
+            framework_args = { arguments.pkg }
         else
             framework_args = vim.tbl_flatten({ framework_args, arguments.pkg })
         end
@@ -51,7 +51,7 @@ local function build_command(fargs, project, tree)
         end
     else
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.class }
+            framework_args = { arguments.class }
         else
             framework_args = vim.tbl_flatten({ framework_args, arguments.class })
         end

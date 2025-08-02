@@ -147,13 +147,26 @@ function M.combine_command_arguments(runner, argslist)
         --- For sbt commands that take arguments,
         --- pass the command and arguments as one argument to sbt by enclosing them in quotes.
         --- See https://www.scala-sbt.org/1.x/docs/Running.html#Batch+mode
-        local test_command = string.format(
-            "testOnly %s -- %s",
-            table.concat(argslist.test_command, " "),
-            table.concat(argslist.framework, " ")
+        local test_command = table.concat(
+            vim.tbl_flatten({
+                "testOnly",
+                argslist.test_command,
+                "--",
+                argslist.framework,
+            }),
+            " "
         )
         return vim.tbl_flatten({ argslist.runner, test_command })
+    elseif runner == "bloop" then
+        local command = vim.tbl_flatten({ argslist.runner, argslist.test_command })
+        for _, arg in pairs(argslist.framework) do
+            table.insert(command, "--args")
+            table.insert(command, arg)
+        end
+        return command
+    else
+        -- It should never happen...
+        error("Should never happen...", vim.log.levels.ERROR)
     end
-    return vim.tbl_flatten({ argslist.runner, argslist.test_command, "--", argslist.framework })
 end
 return M

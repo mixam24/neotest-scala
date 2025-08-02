@@ -6,7 +6,7 @@ import neotest.scala.Testable;
 object BasicSuite extends TestSuite {
 
   def helperFunctionThatThrows() {
-    throw new Error("Helper funnction that throws...");
+    throw new Error("Helper function that throws...");
   }
 
   val tests = Tests {

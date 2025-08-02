@@ -6,7 +6,7 @@ import neotest.scala.Testable;
 class SetSuite extends AnyFunSuite {
 
   def helperFunctionThatThrows() {
-    throw new Error("Helper funnction that throws...");
+    throw new Error("Helper function that throws...");
   }
 
   test("An empty Set should have size 0") {
