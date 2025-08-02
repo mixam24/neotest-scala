@@ -1,0 +1,47 @@
+[info] welcome to sbt 1.11.3 (Ubuntu Java 11.0.28)
+[info] loading global plugins from /home/maksim/.sbt/1.0/plugins
+[info] loading settings for project scala2-build-build from metals.sbt...
+[info] loading project definition from /home/maksim/01git/98other/neotest-scala/tests/data/utest/projects/scala2/project/project
+[info] loading settings for project scala2-build from metals.sbt...
+[info] loading project definition from /home/maksim/01git/98other/neotest-scala/tests/data/utest/projects/scala2/project
+[success] Generated .bloop/scala2-build.json
+[success] Total time: 2 s, completed Aug 2, 2025, 1:54:43 PM
+[info] loading settings for project scala2 from build.sbt...
+[info] set current project to scala2 (in build file:/home/maksim/01git/98other/neotest-scala/tests/data/utest/projects/scala2/)
+-------------------------------- Running Tests --------------------------------
+[32m+[39m neotest.scala.basic.BasicSuite.An empty Set should have size 0 [2m9ms[0m  
+[31mX[39m neotest.scala.basic.BasicSuite.Invoking head on an empty Set should produce NoSuchElementException [2m0ms[0m 
+  [91m[4mjava.util.NoSuchElementException[39m[24m: [91mnext on empty iterator[39m
+    [31mscala.collection.Iterator$$anon$19.[91mnext[31m([91mIterator.scala[39m:[91m973[31m)[39m
+    [31mscala.collection.Iterator$$anon$19.[91mnext[31m([91mIterator.scala[39m:[91m971[31m)[39m
+    [31mscala.collection.IterableOps.[91mhead[31m([91mIterable.scala[39m:[91m222[31m)[39m
+    [31mscala.collection.IterableOps.[91mhead$[31m([91mIterable.scala[39m:[91m222[31m)[39m
+    [31mscala.collection.AbstractIterable.[91mhead[31m([91mIterable.scala[39m:[91m935[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$3[31m([91mBasicSuite.scala[39m:[91m19[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.This one will always fail [2m0ms[0m 
+  [91m[4mjava.lang.AssertionError[39m[24m: [91massertion failed: Oh no...[39m
+    [31mscala.Predef$.[91massert[31m([91mPredef.scala[39m:[91m279[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$4[31m([91mBasicSuite.scala[39m:[91m22[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a function that throw NotImplemented [2m1ms[0m 
+  [91m[4mscala.NotImplementedError[39m[24m: [91mNot implemented![39m
+    [31mneotest.scala.Testable$.[91mnotImplementedError[31m([91mTestable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$6[31m([91mBasicSuite.scala[39m:[91m25[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a nested function that throw NotImplemented [2m0ms[0m 
+  [91m[4mscala.NotImplementedError[39m[24m: [91mNot implemented![39m
+    [31mneotest.scala.Testable$.[91mnotImplementedError[31m([91mTestable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.Testable$.[91mnestedFunction[31m([91mTestable.scala[39m:[91m10[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$7[31m([91mBasicSuite.scala[39m:[91m28[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a function that calls one in another object [2m0ms[0m 
+  [91m[4mjava.lang.Error[39m[24m: [91mFunction that throws error...[39m
+    [31mneotest.scala.Callable$.[91mfunctionThatThrowsError[31m([91mCallable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.Testable$.[91mcallFromAnotherObject[31m([91mTestable.scala[39m:[91m14[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$8[31m([91mBasicSuite.scala[39m:[91m31[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a helper function that throws [2m0ms[0m 
+  [91m[4mjava.lang.Error[39m[24m: [91mHelper funnction that throws...[39m
+    [31mneotest.scala.basic.BasicSuite$.[91mhelperFunctionThatThrows[31m([91mBasicSuite.scala[39m:[91m9[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$9[31m([91mBasicSuite.scala[39m:[91m34[31m)[39m
+[info] Tests: 7, Passed: 1, Failed: 6
+[error] Failed tests:
+[error] 	neotest.scala.basic.BasicSuite
+[error] (Test / testOnly) sbt.TestsFailedException: Tests unsuccessful
+[error] Total time: 1 s, completed Aug 2, 2025, 1:54:45 PM

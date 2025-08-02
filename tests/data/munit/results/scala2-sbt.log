@@ -1,0 +1,38 @@
+[info] welcome to sbt 1.11.2 (Ubuntu Java 11.0.28)
+[info] loading global plugins from /home/maksim/.sbt/1.0/plugins
+[info] loading settings for project scala2-build-build from metals.sbt...
+[info] loading project definition from /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/project/project
+[info] loading settings for project scala2-build from metals.sbt...
+[info] loading project definition from /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/project
+[success] Generated .bloop/scala2-build.json
+[success] Total time: 2 s, completed Aug 2, 2025, 1:50:45 PM
+[info] loading settings for project scala2 from build.sbt...
+[info] set current project to scala2 (in build file:/home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/)
+[32mneotest.basic.BasicSuite:[0m
+[32m  + [0m[32mAn empty Set should have size 0[0m [90m0.01s[0m
+[32m  + [0m[32mInvoking head on an empty Set should produce NoSuchElementException[0m [90m0.002s[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mThis one will always fail[0m  [90m0.019s[0m munit.FailException: src/test/scala/munit/basic/BasicSuite.scala:20 Oh no...
+19:  test("This one will always fail") {
+[7m20:    assert(1 == 0, "Oh no...")[0m
+21:  }
+[90m    at [0m[90mmunit.FunSuite.assert[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$5[0m[1m([0m[1mBasicSuite.scala[0m:[1m20[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that throw NotImplemented[0m  [90m0.002s[0m scala.NotImplementedError: Not implemented!
+[1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$8[0m[1m([0m[1mBasicSuite.scala[0m:[1m23[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a nested function that throw NotImplemented[0m  [90m0.001s[0m scala.NotImplementedError: Not implemented!
+[1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.scala.Testable$.nestedFunction[0m[1m([0m[1mTestable.scala[0m:[1m10[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$9[0m[1m([0m[1mBasicSuite.scala[0m:[1m26[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that calls one in another object[0m  [90m0.002s[0m java.lang.Error: Function that throws error...
+[1m    at [0m[1mneotest.scala.Callable$.functionThatThrowsError[0m[1m([0m[1mCallable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.scala.Testable$.callFromAnotherObject[0m[1m([0m[1mTestable.scala[0m:[1m14[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$10[0m[1m([0m[1mBasicSuite.scala[0m:[1m29[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a helper function that throws[0m  [90m0.001s[0m java.lang.Error: Helper funnction that throws...
+[1m    at [0m[1mneotest.basic.BasicSuite.helperFunctionThatThrows[0m[1m([0m[1mBasicSuite.scala[0m:[1m9[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$11[0m[1m([0m[1mBasicSuite.scala[0m:[1m32[0m[1m)[0m
+[error] Failed: Total 7, Failed 5, Errors 0, Passed 2
+[error] Failed tests:
+[error] 	neotest.basic.BasicSuite
+[error] (Test / test) sbt.TestsFailedException: Tests unsuccessful
+[error] Total time: 1 s, completed Aug 2, 2025, 1:50:47 PM

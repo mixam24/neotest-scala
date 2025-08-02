@@ -1,0 +1,42 @@
+[32mneotest.basic.BasicSuite:[0m
+[32m  + [0m[32mAn empty Set should have size 0[0m [90m0.021s[0m
+[32m  + [0m[32mInvoking head on an empty Set should produce NoSuchElementException[0m [90m0.002s[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mThis one will always fail[0m  [90m0.024s[0m munit.FailException: /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/src/test/scala/munit/basic/BasicSuite.scala:20 Oh no...
+19:  test("This one will always fail") {
+[7m20:    assert(1 == 0, "Oh no...")[0m
+21:  }
+[90m    at [0m[90mmunit.FunSuite.assert[0m[90m([0m[90mFunSuite.scala[0m:[90m11[0m[90m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$5[0m[1m([0m[1mBasicSuite.scala[0m:[1m20[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that throw NotImplemented[0m  [90m0.001s[0m scala.NotImplementedError: Not implemented!
+[1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$8[0m[1m([0m[1mBasicSuite.scala[0m:[1m23[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a nested function that throw NotImplemented[0m  [90m0.001s[0m scala.NotImplementedError: Not implemented!
+[1m    at [0m[1mneotest.scala.Testable$.notImplementedError[0m[1m([0m[1mTestable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.scala.Testable$.nestedFunction[0m[1m([0m[1mTestable.scala[0m:[1m10[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$9[0m[1m([0m[1mBasicSuite.scala[0m:[1m26[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a function that calls one in another object[0m  [90m0.001s[0m java.lang.Error: Function that throws error...
+[1m    at [0m[1mneotest.scala.Callable$.functionThatThrowsError[0m[1m([0m[1mCallable.scala[0m:[1m5[0m[1m)[0m
+[1m    at [0m[1mneotest.scala.Testable$.callFromAnotherObject[0m[1m([0m[1mTestable.scala[0m:[1m14[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$10[0m[1m([0m[1mBasicSuite.scala[0m:[1m29[0m[1m)[0m
+[91m==> X [0m[91mneotest.basic.BasicSuite[0m.[91mCalling a helper function that throws[0m  [90m0.0s[0m java.lang.Error: Helper funnction that throws...
+[1m    at [0m[1mneotest.basic.BasicSuite.helperFunctionThatThrows[0m[1m([0m[1mBasicSuite.scala[0m:[1m9[0m[1m)[0m
+[1m    at [0m[1mneotest.basic.BasicSuite.$anonfun$new$11[0m[1m([0m[1mBasicSuite.scala[0m:[1m32[0m[1m)[0m
+Execution took 50ms
+7 tests, 2 passed, 5 failed
+
+The test execution was successfully closed.
+===============================================
+Total duration: 50ms
+1 failed
+
+Failed:
+- neotest.basic.BasicSuite:
+  * neotest.basic.BasicSuite.Calling a helper function that throws - java.lang.Error: Helper funnction that throws...
+  * neotest.basic.BasicSuite.This one will always fail - munit.FailException: /home/maksim/01git/98other/neotest-scala/tests/data/munit/projects/scala2/src/test/scala/munit/basic/BasicSuite.scala:20 Oh no...
+19:  test("This one will always fail") {
+[7m20:    assert(1 == 0, "Oh no...")[0m
+21:  }
+  * neotest.basic.BasicSuite.Calling a function that throw NotImplemented - scala.NotImplementedError: Not implemented!
+  * neotest.basic.BasicSuite.Calling a function that calls one in another object - java.lang.Error: Function that throws error...
+  * neotest.basic.BasicSuite.Calling a nested function that throw NotImplemented - scala.NotImplementedError: Not implemented!
+===============================================
