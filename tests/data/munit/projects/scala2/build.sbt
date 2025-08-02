@@ -28,7 +28,6 @@ libraryDependencies ++= Seq(
   "org.scalameta" %% "munit" % "1.0.4" % Test
 )
 
-
 logBuffered in Test := false
 
 javacOptions ++= Seq("-source", "11", "-target", "11")

@@ -31,30 +31,33 @@ end
 local function build_command(fargs, project, tree, path)
     local runner_args = common.get_runner_arguments(fargs, project)
     local test_command_args = {}
-    local framework_args = { "--", "-fJ", path }
+    local framework_args = { "-fJ", path }
 
     local arguments = test_arguments(tree)
     if arguments.pkg then
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.pkg }
+            test_command_args = vim.tbl_flatten({ test_command_args, arguments.pkg })
         else
             framework_args = vim.tbl_flatten({ framework_args, "-m", arguments.pkg })
         end
     elseif arguments.name then
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.class }
+            test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
         else
             framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
         end
         framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
     else
         if fargs.runner == "sbt" then
-            test_command_args = { arguments.class }
+            test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
         else
             framework_args = vim.tbl_flatten({ framework_args, "-s", arguments.class })
         end
     end
-    return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
+    return common.combine_command_arguments(
+        fargs.runner,
+        { runner = runner_args, test_command = test_command_args, framework = framework_args }
+    )
 end
 
 ---@param fargs neotest-scala.FrameworkArgs Framework arguments

@@ -126,11 +126,34 @@ function M.get_runner_arguments(fargs, project)
         if fargs.java_home ~= nil then
             args = vim.tbl_flatten({ args, "--java-home", fargs.java_home })
         end
-        args = vim.tbl_flatten({ args, project .. "/testOnly" })
+        args = vim.tbl_flatten({ args, string.format("project %s", project) })
     else
         error("Should never happen...", vim.log.levels.ERROR)
     end
     return args
 end
 
+---@class neotest-scala.ArgsList
+---@field runner table<string> Runner arguments
+---@field test_command table<string> Test command and its arguments that are framework agnostic
+---@field framework table<string> Test framework specific arguments that come after "--" separator
+
+---Returns command arguments properly formatted for the given test runner
+---@param runner string Test runner name
+---@param argslist neotest-scala.ArgsList
+---@return table
+function M.combine_command_arguments(runner, argslist)
+    if runner == "sbt" then
+        --- For sbt commands that take arguments,
+        --- pass the command and arguments as one argument to sbt by enclosing them in quotes.
+        --- See https://www.scala-sbt.org/1.x/docs/Running.html#Batch+mode
+        local test_command = string.format(
+            "testOnly %s -- %s",
+            table.concat(argslist.test_command, " "),
+            table.concat(argslist.framework, " ")
+        )
+        return vim.tbl_flatten({ argslist.runner, test_command })
+    end
+    return vim.tbl_flatten({ argslist.runner, argslist.test_command, "--", argslist.framework })
+end
 return M

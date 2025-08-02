@@ -245,15 +245,19 @@ describe("Sbt scenarios", function()
             })
 
             -- THEN
+            local test_command = table.concat({
+                "testOnly",
+                "neotest.scala.basic.WordSpec",
+                "--",
+                "-fJ",
+                string.format("%s", require("nio").fn.tempname()),
+            }, " ")
             assert.are(result, "Result is nil")
             assert.are_same({
                 "sbt",
                 "-Dsbt.supershell=false",
-                "project" .. "/testOnly",
-                "neotest.scala.basic.WordSpec",
-                "--",
-                "-fJ",
-                require("nio").fn.tempname(),
+                "project project",
+                test_command,
             }, result.command, "Not what expected as command")
             assert.are_same(
                 { results_path = require("nio").fn.tempname() },
@@ -286,17 +290,21 @@ describe("Sbt scenarios", function()
             })
 
             -- THEN
+            local test_command = table.concat({
+                "testOnly",
+                "neotest.scala.basic.WordSpec",
+                "--",
+                "-fJ",
+                string.format("%s", require("nio").fn.tempname()),
+                "-z",
+                '"A Set when empty should produce NoSuchElementException when head is invoked"',
+            }, " ")
             assert.are(result, "Result is nil")
             assert.are_same({
                 "sbt",
                 "-Dsbt.supershell=false",
-                "project" .. "/testOnly",
-                "neotest.scala.basic.WordSpec",
-                "--",
-                "-fJ",
-                require("nio").fn.tempname(),
-                "-z",
-                '"A Set when empty should produce NoSuchElementException when head is invoked"',
+                "project project",
+                test_command,
             }, result.command, "Not what expected as command")
             assert.are_same(
                 { results_path = require("nio").fn.tempname() },

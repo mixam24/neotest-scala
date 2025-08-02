@@ -3,6 +3,7 @@ local utils = require("neotest-scala.munit.results.utils")
 local color = const.color
 local fragment = const.fragment
 local code = const.code
+local modifier = const.modifier
 
 local M = {}
 
@@ -19,30 +20,34 @@ local runtime_class_name =
 local filename = (code.any - color.ALL) ^ 1
 local erorr_line = vim.lpeg.Cg(code.numeric ^ 1, "error_line")
 
-M.framework_trace = utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * code.spaces)
+M.framework_trace = modifier.sbt_wrapper_code ^ 0
+    * utils.colored(color.faint, code.spaces * vim.lpeg.P("at") * code.spaces)
     * utils.colored(color.faint, runtime_class_name)
     * utils.colored(color.faint, vim.lpeg.P("("))
     * utils.colored(color.faint, filename)
     * vim.lpeg.P(":")
     * utils.colored(color.faint, erorr_line)
     * utils.colored(color.faint, vim.lpeg.P(")"))
+    * modifier.sbt_wrapper_code ^ 0
 
 M.code_trace = vim.lpeg.Ct(
-    utils.colored(color.high_intensity, code.spaces * vim.lpeg.P("at") * code.spaces)
+    modifier.sbt_wrapper_code ^ 0
+        * utils.colored(color.high_intensity, code.spaces * vim.lpeg.P("at") * code.spaces)
         * utils.colored(color.high_intensity, runtime_class_name)
         * utils.colored(color.high_intensity, vim.lpeg.P("("))
         * utils.colored(color.high_intensity, filename)
         * vim.lpeg.P(":")
         * utils.colored(color.high_intensity, erorr_line)
         * utils.colored(color.high_intensity, vim.lpeg.P(")"))
+        * modifier.sbt_wrapper_code ^ 0
 )
 
----Removes color codes from the given stack trace string
+---Removes color and modifier codes from the given stack trace string
 ---@param line string Colored stack trace line of text
 ---@return string
 M.cleaned_trace_line = function(line)
     --- Any matched color code passed to the function...
-    local pattern = vim.lpeg.Cs((color.ALL / function(_)
+    local pattern = vim.lpeg.Cs(((color.ALL + modifier.ALL) / function(_)
         return ""
     end + 1) ^ 0)
     return vim.lpeg.match(pattern, line)
@@ -53,12 +58,14 @@ end
 --- 2. https://github.com/scalameta/munit/blob/50aa2fff7880292bbfa7d6a0476270c8fe7ff28b/junit-interface/src/main/java/munit/internal/junitinterface/EventDispatcher.java#L89
 
 M.test_failure = vim.lpeg.Ct(
-    utils.colored(color.light_red, vim.lpeg.P("==> X "))
+    modifier.sbt_wrapper_code ^ 0
+        * utils.colored(color.light_red, vim.lpeg.P("==> X "))
         * failed_test_abs_name
         * code.spaces
         * utils.colored(color.faint, fragment.duration)
         * code.spaces
         * error_message
+        * modifier.sbt_wrapper_code ^ 0
 )
 
 return M

@@ -19,6 +19,20 @@ end
 ---@type vim.lpeg.Pattern
 M.color.ALL = COLORS
 
+M.modifier = {}
+M.modifier.sbt_wrapper_code = vim.lpeg.P("\x1B[0J")
+
+local MODIFIERS = nil
+for _, value in pairs(M.modifier) do
+    if MODIFIERS == nil then
+        MODIFIERS = value
+    else
+        MODIFIERS = MODIFIERS + value
+    end
+end
+
+---@type vim.lpeg.Pattern
+M.modifier.ALL = MODIFIERS
 --- ALPHA-NUMERIC CODES
 M.code = {}
 M.code.alpha_numeric = vim.lpeg.R("az", "AZ", "09")

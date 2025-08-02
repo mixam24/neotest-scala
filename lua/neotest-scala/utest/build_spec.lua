@@ -30,7 +30,7 @@ end
 local function build_command(fargs, project, tree)
     local runner_args = common.get_runner_arguments(fargs, project)
     local test_command_args = {}
-    local framework_args = { "--" }
+    local framework_args = {}
 
     local arguments = test_arguments(tree)
     --- TODO: should we remove pkg from the TestArguments?
@@ -56,7 +56,10 @@ local function build_command(fargs, project, tree)
             framework_args = vim.tbl_flatten({ framework_args, arguments.class })
         end
     end
-    return vim.tbl_flatten({ runner_args, test_command_args, framework_args })
+    return common.combine_command_arguments(
+        fargs.runner,
+        { runner = runner_args, test_command = test_command_args, framework = framework_args }
+    )
 end
 
 ---@param fargs neotest-scala.FrameworkArgs Framework argusments
