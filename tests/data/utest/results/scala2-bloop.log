@@ -1,0 +1,49 @@
+-------------------------------- Running Tests --------------------------------
+[32m+[39m neotest.scala.basic.BasicSuite.An empty Set should have size 0 [2m10ms[0m  
+[31mX[39m neotest.scala.basic.BasicSuite.Invoking head on an empty Set should produce NoSuchElementException [2m0ms[0m 
+  [91m[4mjava.util.NoSuchElementException[39m[24m: [91mnext on empty iterator[39m
+    [31mscala.collection.Iterator$$anon$19.[91mnext[31m([91mIterator.scala[39m:[91m973[31m)[39m
+    [31mscala.collection.Iterator$$anon$19.[91mnext[31m([91mIterator.scala[39m:[91m971[31m)[39m
+    [31mscala.collection.IterableOps.[91mhead[31m([91mIterable.scala[39m:[91m222[31m)[39m
+    [31mscala.collection.IterableOps.[91mhead$[31m([91mIterable.scala[39m:[91m222[31m)[39m
+    [31mscala.collection.AbstractIterable.[91mhead[31m([91mIterable.scala[39m:[91m935[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$3[31m([91mBasicSuite.scala[39m:[91m19[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.This one will always fail [2m1ms[0m 
+  [91m[4mjava.lang.AssertionError[39m[24m: [91massertion failed: Oh no...[39m
+    [31mscala.Predef$.[91massert[31m([91mPredef.scala[39m:[91m279[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$4[31m([91mBasicSuite.scala[39m:[91m22[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a function that throw NotImplemented [2m0ms[0m 
+  [91m[4mscala.NotImplementedError[39m[24m: [91mNot implemented![39m
+    [31mneotest.scala.Testable$.[91mnotImplementedError[31m([91mTestable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$6[31m([91mBasicSuite.scala[39m:[91m25[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a nested function that throw NotImplemented [2m0ms[0m 
+  [91m[4mscala.NotImplementedError[39m[24m: [91mNot implemented![39m
+    [31mneotest.scala.Testable$.[91mnotImplementedError[31m([91mTestable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.Testable$.[91mnestedFunction[31m([91mTestable.scala[39m:[91m10[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$7[31m([91mBasicSuite.scala[39m:[91m28[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a function that calls one in another object [2m0ms[0m 
+  [91m[4mjava.lang.Error[39m[24m: [91mFunction that throws error...[39m
+    [31mneotest.scala.Callable$.[91mfunctionThatThrowsError[31m([91mCallable.scala[39m:[91m5[31m)[39m
+    [31mneotest.scala.Testable$.[91mcallFromAnotherObject[31m([91mTestable.scala[39m:[91m14[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$8[31m([91mBasicSuite.scala[39m:[91m31[31m)[39m
+[31mX[39m neotest.scala.basic.BasicSuite.Calling a helper function that throws [2m0ms[0m 
+  [91m[4mjava.lang.Error[39m[24m: [91mHelper funnction that throws...[39m
+    [31mneotest.scala.basic.BasicSuite$.[91mhelperFunctionThatThrows[31m([91mBasicSuite.scala[39m:[91m9[31m)[39m
+    [31mneotest.scala.basic.BasicSuite$.[91m$anonfun$tests$9[31m([91mBasicSuite.scala[39m:[91m34[31m)[39m
+Execution took 11ms
+7 tests, 1 passed, 6 failed
+
+The test execution was successfully closed.
+===============================================
+Total duration: 11ms
+1 failed
+
+Failed:
+- neotest.scala.basic.BasicSuite:
+  * Calling a nested function that throw NotImplemented - scala.NotImplementedError: Not implemented!
+  * Invoking head on an empty Set should produce NoSuchElementException - java.util.NoSuchElementException: next on empty iterator
+  * This one will always fail - java.lang.AssertionError: assertion failed: Oh no...
+  * Calling a function that throw NotImplemented - scala.NotImplementedError: Not implemented!
+  * Calling a helper function that throws - java.lang.Error: Helper funnction that throws...
+  * Calling a function that calls one in another object - java.lang.Error: Function that throws error...
+===============================================

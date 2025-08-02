@@ -9,7 +9,7 @@ describe("Basic scenarios", function()
         "should process results file and return statuses",
         async(function()
             -- GIVEN
-            local file_path = vim.env.TEST_DATA_DIR .. "/munit/results/scala2.log"
+            local file_path = vim.env.TEST_DATA_DIR .. "/munit/results/scala2-bloop.log"
 
             -- WHEN
             local results = scala.results(

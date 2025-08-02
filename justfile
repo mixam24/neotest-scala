@@ -8,12 +8,12 @@ run-scalatest-project-tests runner='bloop':
     set -euxo pipefail
 
     PROJECT_DIR="{{ justfile_directory() }}/tests/data/scalatest/projects/scala2"
-    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/scalatest/results/scala2.log"
+    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/scalatest/results/scala2-{{runner}}.log"
 
     cd "${PROJECT_DIR}"
     if [ "{{runner}}" == "sbt" ]
     then
-      sbt -java-home "{{java-home}}" test -- -fJ "${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 1 ]
+      sbt -java-home "{{java-home}}" -Dsbt.supershell=false "testOnly -- -fJ ${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 1 ]
     else
       sbt -java-home "{{java-home}}" bloopInstall
       bloop test -p scala2 -- -fJ "${OUTPUT_FILE}" >> /dev/null 2>&1 || [ $? -eq 32 ]
@@ -24,12 +24,12 @@ run-munit-project-tests runner='bloop':
     set -euxo pipefail
 
     PROJECT_DIR="{{ justfile_directory() }}/tests/data/munit/projects/scala2"
-    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/munit/results/scala2.log"
+    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/munit/results/scala2-{{runner}}.log"
 
     cd "${PROJECT_DIR}"
     if [ "{{runner}}" == "sbt" ]
     then
-      sbt -java-home "{{java-home}}" test &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
+      sbt -java-home "{{java-home}}" -Dsbt.supershell=false testOnly &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
     else
       sbt -java-home "{{java-home}}" bloopInstall
       bloop test -p scala2 &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
@@ -40,12 +40,12 @@ run-utest-project-tests runner='bloop':
     set -euxo pipefail
 
     PROJECT_DIR="{{ justfile_directory() }}/tests/data/utest/projects/scala2"
-    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/utest/results/scala2.log"
+    OUTPUT_FILE="{{ justfile_directory() }}/tests/data/utest/results/scala2-{{runner}}.log"
 
     cd "${PROJECT_DIR}"
     if [ "{{runner}}" == "sbt" ]
     then
-      sbt -java-home "{{java-home}}" test &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
+      sbt -java-home "{{java-home}}" -Dsbt.supershell=false testOnly &> "${OUTPUT_FILE}" || [ $? -eq 1 ]
     else
       sbt -java-home "{{java-home}}" bloopInstall
       bloop test -p scala2 &> "${OUTPUT_FILE}" || [ $? -eq 32 ]
