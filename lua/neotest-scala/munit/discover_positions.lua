@@ -79,6 +79,16 @@ return function(path)
       function: (identifier) @test.func_name (#match? @test.func_name "test")
       arguments: (arguments (string) @test.name))
     )) @test.definition
+    ; Matches: test('name').<marker>  {...}
+    ((call_expression
+      function: (call_expression
+      function: (identifier) @test.func_name (#match? @test.func_name "test")
+      arguments: (arguments
+        (field_expression
+          value: (string) @test.name
+          field: (identifier)
+      )))
+    )) @test.definition
     ]]
 
     local packages = pkgs.discover_packages(path)

@@ -24,14 +24,13 @@ describe("Basic scenarios", function()
                 range = { 0, 0, 34, 0 },
                 type = "file",
             })
-            assert.array(list[2]).has.no.holes(7)
+            assert.array(list[2]).has.no.holes(8)
             assert.are_equal("neotest.basic.BasicSuite::An empty Set should have size 0", list[2][2][1].id)
-        end)
-    )
-    it(
-        "should find positions with fail mark",
-        async(function()
-            --- TODO: add test
+            --- position with fail mark
+            assert.are_equal(
+                "neotest.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException",
+                list[2][3][1].id
+            )
         end)
     )
     it(
