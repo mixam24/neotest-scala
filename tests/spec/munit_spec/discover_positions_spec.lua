@@ -21,52 +21,22 @@ describe("Basic scenarios", function()
                 id = file_path,
                 name = "BasicSuite.scala",
                 path = file_path,
-                range = { 0, 0, 34, 0 },
+                range = { 0, 0, 66, 0 },
                 type = "file",
             })
-            assert.array(list[2]).has.no.holes(7)
+            assert.array(list[2]).has.no.holes(11)
             assert.are_equal("neotest.basic.BasicSuite::An empty Set should have size 0", list[2][2][1].id)
-        end)
-    )
-    it(
-        "should find positions with fail mark",
-        async(function()
-            --- TODO: add test
-        end)
-    )
-    it(
-        "should find positions with pending mark",
-        async(function()
-
-            --- TODO: add test
-        end)
-    )
-    it(
-        "should find positions with tag mark",
-        async(function()
-
-            --- TODO: add test
-        end)
-    )
-    it(
-        "should find positions with flaky mark",
-        async(function()
-
-            --- TODO: add test
-        end)
-    )
-    it(
-        "should find positions with only mark",
-        async(function()
-
-            --- TODO: add test
-        end)
-    )
-    it(
-        "should find positions with ignore mark",
-        async(function()
-
-            --- TODO: add test
+            --- position with fail mark
+            assert.are_equal(
+                "neotest.basic.BasicSuite::Invoking head on an empty Set should produce NoSuchElementException",
+                list[2][3][1].id
+            )
+            --- position with pending mark with comment
+            assert.are_equal("neotest.basic.BasicSuite::Not ready yet test", list[2][9][1].id)
+            --- position with tag
+            assert.are_equal("neotest.basic.BasicSuite::Some test to re-run", list[2][10][1].id)
+            --- position with flaky mark
+            assert.are_equal("neotest.basic.BasicSuite::Some flaky test", list[2][11][1].id)
         end)
     )
 end)

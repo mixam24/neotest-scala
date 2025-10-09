@@ -31,5 +31,9 @@ local opts = minit.busted.setup({
         -- use ansi colors
         colors = false,
     },
+    rocks = {
+        enabled = true,
+        server = "https://lux.lumen-labs.org/rocks-binaries/",
+    },
 })
 minit.setup(opts)

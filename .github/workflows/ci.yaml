@@ -2,6 +2,8 @@ name: CI
 on:
   workflow_dispatch:
 
+  push:
+
   workflow_call:
     inputs:
       plugin:
@@ -43,9 +45,9 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - uses: pre-commit/action@v3.0.1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.1
 
   stylua:
     name: Stylua
