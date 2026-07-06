@@ -1,4 +1,4 @@
-java-home := "/usr/lib/jvm/java-11-openjdk-amd64/"
+java-home := "/Library/Java/JavaVirtualMachines/openjdk-11.jdk/Contents/Home/"
 
 test:
     ./scripts/test

@@ -1,6 +1,7 @@
 local nio = require("nio")
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
+local utils = require("neotest-scala.common.utlis")
 
 ---@class TestArguments
 ---@field name string|nil
@@ -36,23 +37,23 @@ local function build_command(fargs, project, tree, path)
     local arguments = test_arguments(tree)
     if arguments.pkg then
         if fargs.runner == "sbt" then
-            test_command_args = vim.tbl_flatten({ test_command_args, arguments.pkg })
+            test_command_args = utils.tbl_flatten({ test_command_args, arguments.pkg })
         else
-            framework_args = vim.tbl_flatten({ framework_args, "-o", arguments.pkg })
+            framework_args = utils.tbl_flatten({ framework_args, "-o", arguments.pkg })
         end
     elseif arguments.name then
         if fargs.runner == "sbt" then
-            test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
-            framework_args = vim.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
+            test_command_args = utils.tbl_flatten({ test_command_args, arguments.class })
+            framework_args = utils.tbl_flatten({ framework_args, "-z", string.format('"%s"', arguments.name) })
         else
-            test_command_args = vim.tbl_flatten({ test_command_args, "-o", arguments.class })
-            framework_args = vim.tbl_flatten({ framework_args, "-z", arguments.name })
+            test_command_args = utils.tbl_flatten({ test_command_args, "-o", arguments.class })
+            framework_args = utils.tbl_flatten({ framework_args, "-z", arguments.name })
         end
     else
         if fargs.runner == "sbt" then
-            test_command_args = vim.tbl_flatten({ test_command_args, arguments.class })
+            test_command_args = utils.tbl_flatten({ test_command_args, arguments.class })
         else
-            test_command_args = vim.tbl_flatten({ test_command_args, "-o", arguments.class })
+            test_command_args = utils.tbl_flatten({ test_command_args, "-o", arguments.class })
         end
     end
     return common.combine_command_arguments(
