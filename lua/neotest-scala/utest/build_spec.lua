@@ -1,6 +1,7 @@
 local lib = require("neotest.lib")
 local common = require("neotest-scala.common.build_spec")
 local logger = require("neotest.logging")
+local utils = require("neotest-scala.common.utlis")
 
 ---@class TestArguments
 ---@field name string|nil
@@ -39,21 +40,21 @@ local function build_command(fargs, project, tree)
         if fargs.runner == "sbt" then
             framework_args = { arguments.pkg }
         else
-            framework_args = vim.tbl_flatten({ framework_args, arguments.pkg })
+            framework_args = utils.tbl_flatten({ framework_args, arguments.pkg })
         end
     elseif arguments.name then
         if fargs.runner == "sbt" then
             framework_args =
-                vim.tbl_flatten({ framework_args, string.format('"%s.%s"', arguments.class, arguments.name) })
+                utils.tbl_flatten({ framework_args, string.format('"%s.%s"', arguments.class, arguments.name) })
         else
             framework_args =
-                vim.tbl_flatten({ framework_args, string.format("%s.%s", arguments.class, arguments.name) })
+                utils.tbl_flatten({ framework_args, string.format("%s.%s", arguments.class, arguments.name) })
         end
     else
         if fargs.runner == "sbt" then
             framework_args = { arguments.class }
         else
-            framework_args = vim.tbl_flatten({ framework_args, arguments.class })
+            framework_args = utils.tbl_flatten({ framework_args, arguments.class })
         end
     end
     return common.combine_command_arguments(
