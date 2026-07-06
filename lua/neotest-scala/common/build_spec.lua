@@ -1,5 +1,6 @@
 local lib = require("neotest.lib")
 local utils = require("neotest-scala.utils")
+local cutils = require("neotest-scala.common.utlis")
 
 local M = {}
 
@@ -124,9 +125,9 @@ function M.get_runner_arguments(fargs, project)
             "-Dsbt.supershell=false",
         }
         if fargs.java_home ~= nil then
-            args = vim.tbl_flatten({ args, "--java-home", fargs.java_home })
+            args = cutils.tbl_flatten({ args, "--java-home", fargs.java_home })
         end
-        args = vim.tbl_flatten({ args, string.format("project %s", project) })
+        args = cutils.tbl_flatten({ args, string.format("project %s", project) })
     else
         error("Should never happen...", vim.log.levels.ERROR)
     end
@@ -148,7 +149,7 @@ function M.combine_command_arguments(runner, argslist)
         --- pass the command and arguments as one argument to sbt by enclosing them in quotes.
         --- See https://www.scala-sbt.org/1.x/docs/Running.html#Batch+mode
         local test_command = table.concat(
-            vim.tbl_flatten({
+            cutils.tbl_flatten({
                 "testOnly",
                 argslist.test_command,
                 "--",
@@ -156,9 +157,9 @@ function M.combine_command_arguments(runner, argslist)
             }),
             " "
         )
-        return vim.tbl_flatten({ argslist.runner, test_command })
+        return cutils.tbl_flatten({ argslist.runner, test_command })
     elseif runner == "bloop" then
-        local command = vim.tbl_flatten({ argslist.runner, argslist.test_command })
+        local command = cutils.tbl_flatten({ argslist.runner, argslist.test_command })
         for _, arg in pairs(argslist.framework) do
             table.insert(command, "--args")
             table.insert(command, arg)
