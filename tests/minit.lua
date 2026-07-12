@@ -3,6 +3,9 @@
 vim.env.LAZY_STDPATH = ".tests"
 vim.env.TEST_DATA_DIR = vim.fn.getcwd() .. "/tests/data"
 load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
+--- Must be installed before nvim-treesitter setup
+--- It can't be part of build function because it is async, see https://lazy.folke.io/developers#building
+vim.system({ "npm", "install", "-g", "tree-sitter-cli" }, { text = true })
 
 -- Setup lazy.nvim
 local minit = require("lazy.minit")
@@ -24,15 +27,19 @@ local opts = minit.busted.setup({
                     --- NOTE: https://github.com/neovim-treesitter/nvim-treesitter/tree/main?tab=readme-ov-file#requirements
                     branch = "main",
                     lazy = false,
-                    build = function()
-                        vim.system({ "npm", "install", "-g", "tree-sitter-cli" }):wait()
-                    end,
                     dependencies = { "neovim-treesitter/treesitter-parser-registry" },
                     main = "nvim-treesitter",
                     config = function(plugin, _)
-                        require(plugin.main).install({ "scala" }, {}):pwait()
                         require(plugin.main).setup({})
-                        vim.print(require(plugin.main).status())
+                        require(plugin.main).install({ "scala" }, {}):wait()
+                        --- https://github.com/nvim-treesitter/nvim-treesitter/issues/8053#issuecomment-3148777265
+                        vim.api.nvim_create_autocmd("FileType", {
+                            pattern = "*",
+                            callback = function()
+                                vim.treesitter.start()
+                            end,
+                            once = true,
+                        })
                     end,
                 },
             },
@@ -49,7 +56,7 @@ local opts = minit.busted.setup({
         colors = false,
     },
     performance = {
-        reset_packpath = false,
+        reset_packpath = true,
         rtp = {
             --- NOTE: otherwise treesitter parser for scala is not visible right after installation
             reset = false,
