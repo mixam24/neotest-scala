@@ -25,8 +25,8 @@ local opts = minit.busted.setup({
             dependencies = {
                 "MisanthropicBit/neotest-busted",
                 {
-                    "neovim-treesitter/nvim-treesitter",
-                    --- NOTE: https://github.com/neovim-treesitter/nvim-treesitter/tree/main?tab=readme-ov-file#requirements
+                    "nvim-treesitter/nvim-treesitter",
+                    --- NOTE: https://github.com/nvim-treesitter/nvim-treesitter#requirements
                     branch = "main",
                     lazy = false,
                     dependencies = { "neovim-treesitter/treesitter-parser-registry" },
@@ -52,8 +52,8 @@ local opts = minit.busted.setup({
     performance = {
         reset_packpath = true,
         rtp = {
-            --- NOTE: otherwise treesitter parser for scala is not visible right after installation
             reset = true,
+            --- NOTE: otherwise treesitter parser for scala is not visible right after installation
             paths = { vim.fs.normalize(tresitter_dir) },
         },
     },
